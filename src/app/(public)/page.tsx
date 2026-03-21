@@ -19,8 +19,13 @@ export default function HomePage() {
   return (
     <div className="bg-surface-container/30 min-h-screen">
       <HeroSection />
-      <SearchBar />
+      <div className="md:block hidden">
+        <SearchBar />
+      </div>
       <FeaturedBikes />
+      <div className="md:hidden block">
+        <SearchBar />
+      </div>
       <WhyChooseUs />
       <CTASection />
     </div>

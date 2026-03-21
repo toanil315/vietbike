@@ -32,6 +32,9 @@ export interface Vehicle {
   rating: number;
   reviewCount: number;
   location?: string;
+  plate?: string;
+  weeklyRate?: number;
+  monthlyRate?: number;
 }
 
 export type BookingStatus = 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';

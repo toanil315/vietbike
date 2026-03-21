@@ -23,25 +23,25 @@ import { formatPrice, cn } from '@/lib/utils';
 
 export default function AdminDashboardContent() {
   const stats = [
-    { name: 'Total Revenue', value: '142.5M VND', change: '+12.5%', icon: TrendingUp, color: 'text-primary', bg: 'bg-primary/10' },
-    { name: 'Active Bookings', value: '24', change: '+4.2%', icon: CalendarCheck, color: 'text-tertiary', bg: 'bg-tertiary/10' },
-    { name: 'Total Customers', value: '1,284', change: '+18.3%', icon: Users, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { name: 'Available Bikes', value: '42/50', change: '-2.1%', icon: Bike, color: 'text-primary', bg: 'bg-primary/10' },
+    { name: 'Tổng doanh thu', value: '142.5M VND', change: '+12.5%', icon: TrendingUp, color: 'text-primary', bg: 'bg-primary/10' },
+    { name: 'Đơn đang hoạt động', value: '24', change: '+4.2%', icon: CalendarCheck, color: 'text-tertiary', bg: 'bg-tertiary/10' },
+    { name: 'Tổng khách hàng', value: '1,284', change: '+18.3%', icon: Users, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { name: 'Xe sẵn có', value: '42/50', change: '-2.1%', icon: Bike, color: 'text-primary', bg: 'bg-primary/10' },
   ];
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-          <p className="text-secondary">Welcome back, here's what's happening today.</p>
+          <h1 className="text-3xl font-bold">Tổng quan hệ thống</h1>
+          <p className="text-secondary">Chào mừng bạn trở lại, sau đây là tình hình hoạt động hôm nay.</p>
         </div>
         <div className="flex gap-3">
           <button className="px-4 py-2 bg-white border border-outline-variant/15 rounded-xl text-sm font-bold hover:bg-surface-container transition-default">
-            Download Report
+            Tải báo cáo
           </button>
           <button className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-container transition-default">
-            Manage Fleet
+            Quản lý đội xe
           </button>
         </div>
       </div>
@@ -74,10 +74,10 @@ export default function AdminDashboardContent() {
         {/* Main Chart */}
         <div className="lg:col-span-2 glass p-8 rounded-3xl space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">Revenue Performance</h3>
+            <h3 className="font-bold text-lg">Biểu đồ doanh thu</h3>
             <select className="bg-surface-container border-none rounded-lg text-xs font-bold py-1 px-3">
-              <option>Last 6 Months</option>
-              <option>Last Year</option>
+              <option>6 tháng qua</option>
+              <option>Năm qua</option>
             </select>
           </div>
           <div className="h-80 w-full">
@@ -94,7 +94,7 @@ export default function AdminDashboardContent() {
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#505f76'}} tickFormatter={(v) => `${v/1000000}M`} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 40px rgba(19, 27, 46, 0.06)' }}
-                  formatter={(v: any) => [formatPrice(Number(v)), 'Revenue']}
+                  formatter={(v: any) => [formatPrice(Number(v)), 'Doanh thu']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#00685f" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
               </AreaChart>
@@ -105,8 +105,8 @@ export default function AdminDashboardContent() {
         {/* Recent Bookings */}
         <div className="glass p-8 rounded-3xl space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">Recent Bookings</h3>
-            <button className="text-primary text-xs font-bold hover:underline">View All</button>
+            <h3 className="font-bold text-lg">Đơn đặt xe gần đây</h3>
+            <button className="text-primary text-xs font-bold hover:underline">Xem tất cả</button>
           </div>
           <div className="space-y-6">
             {BOOKINGS.slice(0, 5).map((booking) => (
@@ -127,7 +127,10 @@ export default function AdminDashboardContent() {
                     booking.status === 'completed' ? "bg-emerald-100 text-emerald-700" : 
                     booking.status === 'active' ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"
                   )}>
-                    {booking.status}
+                    {booking.status === 'completed' ? 'Hoàn thành' : 
+                     booking.status === 'confirmed' ? 'Đã xác nhận' :
+                     booking.status === 'active' ? 'Đang thuê' :
+                     booking.status === 'pending' ? 'Chờ xác nhận' : 'Đã hủy'}
                   </span>
                 </div>
               </div>

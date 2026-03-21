@@ -1,6 +1,5 @@
-import React from 'react';
-import AdminDashboardContent from './dashboard-content';
+import DashboardContent from '@/components/admin/DashboardContent';
 
 export default function AdminDashboardPage() {
-  return <AdminDashboardContent />;
+  return <DashboardContent />;
 }

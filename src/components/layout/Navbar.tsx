@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Bike, User, LayoutDashboard, Search, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -7,7 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,7 +37,7 @@ export default function Navbar() {
       )}
     >
       <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center text-white transition-all duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-lg shadow-primary/20">
             <Bike size={22} />
           </div>
@@ -49,16 +52,16 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.href}
+                href={link.href}
                 className={cn(
                   "text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:text-primary relative group",
-                  location.pathname === link.href ? "text-primary" : "text-secondary"
+                  pathname === link.href ? "text-primary" : "text-secondary"
                 )}
               >
                 {link.name}
                 <span className={cn(
                   "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
-                  location.pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
+                  pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
                 )}></span>
               </Link>
             ))}
@@ -68,14 +71,14 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <Link
-              to="/admin"
+              href="/admin"
               className="p-2 text-secondary hover:text-primary transition-colors"
               title="Admin Dashboard"
             >
               <LayoutDashboard size={20} />
             </Link>
             <Link
-              to="/bikes"
+              href="/bikes"
               className="bg-on-surface text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all duration-500 shadow-xl shadow-black/5 active:scale-95"
             >
               Book a Ride
@@ -104,10 +107,10 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.href}
+                href={link.href}
                 className={cn(
                   "text-xl font-bold transition-colors",
-                  location.pathname === link.href ? "text-primary" : "text-on-surface"
+                  pathname === link.href ? "text-primary" : "text-on-surface"
                 )}
                 onClick={() => setIsOpen(false)}
               >
@@ -116,7 +119,7 @@ export default function Navbar() {
             ))}
             <div className="h-px bg-outline-variant/10 my-2"></div>
             <Link
-              to="/admin"
+              href="/admin"
               className="flex items-center gap-3 text-lg font-bold text-secondary"
               onClick={() => setIsOpen(false)}
             >
@@ -124,7 +127,7 @@ export default function Navbar() {
               Admin Dashboard
             </Link>
             <Link
-              to="/bikes"
+              href="/bikes"
               className="bg-primary text-white px-6 py-5 rounded-3xl text-center font-black uppercase tracking-widest shadow-xl shadow-primary/20"
               onClick={() => setIsOpen(false)}
             >

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Bike, Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowUpRight, Youtube } from 'lucide-react';
 
 export default function Footer() {
@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-20">
           <div className="md:col-span-4 space-y-8">
-            <Link to="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-3 group">
               <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white transition-all duration-500 group-hover:rotate-12 shadow-lg shadow-primary/20">
                 <Bike size={26} />
               </div>
@@ -37,10 +37,10 @@ export default function Footer() {
           <div className="md:col-span-2">
             <h4 className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-8">Explore</h4>
             <ul className="space-y-4 text-sm font-bold text-white/60">
-              <li><Link to="/" className="hover:text-white transition-colors flex items-center gap-2 group">Home <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
-              <li><Link to="/bikes" className="hover:text-white transition-colors flex items-center gap-2 group">Our Fleet <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
-              <li><Link to="/#locations" className="hover:text-white transition-colors flex items-center gap-2 group">Locations <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
-              <li><Link to="/contact" className="hover:text-white transition-colors flex items-center gap-2 group">Contact <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
+              <li><Link href="/" className="hover:text-white transition-colors flex items-center gap-2 group">Home <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
+              <li><Link href="/bikes" className="hover:text-white transition-colors flex items-center gap-2 group">Our Fleet <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
+              <li><Link href="/#locations" className="hover:text-white transition-colors flex items-center gap-2 group">Locations <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors flex items-center gap-2 group">Contact <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" /></Link></li>
             </ul>
           </div>
 

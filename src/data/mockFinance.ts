@@ -44,10 +44,10 @@ export const FINANCE_RECORDS: FinanceRecord[] = [
 ];
 
 export const REVENUE_DATA = [
-  { name: 'Jan', revenue: 45000000, expenses: 20000000 },
-  { name: 'Feb', revenue: 52000000, expenses: 22000000 },
-  { name: 'Mar', revenue: 61000000, expenses: 25000000 },
-  { name: 'Apr', revenue: 58000000, expenses: 24000000 },
-  { name: 'May', revenue: 72000000, expenses: 28000000 },
-  { name: 'Jun', revenue: 85000000, expenses: 32000000 },
+  { name: 'Tháng 1', revenue: 45000000, expenses: 20000000 },
+  { name: 'Tháng 2', revenue: 52000000, expenses: 22000000 },
+  { name: 'Tháng 3', revenue: 61000000, expenses: 25000000 },
+  { name: 'Tháng 4', revenue: 58000000, expenses: 24000000 },
+  { name: 'Tháng 5', revenue: 72000000, expenses: 28000000 },
+  { name: 'Tháng 6', revenue: 85000000, expenses: 32000000 },
 ];

@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
-import { Check, Package } from 'lucide-react';
-import { useBookingStore } from '@/store/bookingStore';
-import { ADDONS } from '@/data/mockData';
-import { formatPrice, cn } from '@/lib/utils';
+import { Package } from "lucide-react";
+import { useBookingStore } from "@/store/bookingStore";
+import { useAddons } from "@/hooks/useLocations";
+import { ADDONS } from "@/data/mockData";
+import { AddonItem } from "./components/AddonItem";
 
+/**
+ * Addons selection component with API integration
+ */
 export default function AddonsSelector() {
   const { selectedAddons, toggleAddon } = useBookingStore();
+  const { data: apiAddons } = useAddons();
+  const addons = apiAddons && apiAddons.length > 0 ? apiAddons : ADDONS;
 
   return (
     <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-outline-variant/10 space-y-10">
@@ -18,29 +24,16 @@ export default function AddonsSelector() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {ADDONS.map((addon) => (
-          <button
+        {addons.map((addon) => (
+          <AddonItem
             key={addon.id}
-            onClick={() => toggleAddon(addon.id)}
-            className={cn(
-              "p-6 rounded-3xl border-2 text-left transition-all flex justify-between items-center group",
-              selectedAddons.includes(addon.id) 
-                ? "border-primary bg-primary/5 shadow-md shadow-primary/5" 
-                : "border-outline-variant/10 hover:border-primary/30 bg-surface-container/30"
-            )}
-          >
-            <div className="flex-1 pr-4">
-              <p className="font-bold text-on-surface group-hover:text-primary transition-colors">{addon.name}</p>
-              <p className="text-xs text-secondary mt-1">{addon.description}</p>
-              <p className="text-sm font-bold text-primary mt-3">+{formatPrice(addon.price)}<span className="text-[10px] text-secondary font-medium">/day</span></p>
-            </div>
-            <div className={cn(
-              "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-              selectedAddons.includes(addon.id) ? "bg-primary text-white scale-110" : "bg-white text-secondary border border-outline-variant/20"
-            )}>
-              <Check size={18} />
-            </div>
-          </button>
+            id={addon.id}
+            name={addon.name}
+            description={addon.description || ""}
+            price={addon.price}
+            isSelected={selectedAddons.includes(addon.id)}
+            onToggle={toggleAddon}
+          />
         ))}
       </div>
     </div>

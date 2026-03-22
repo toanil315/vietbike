@@ -1,11 +1,42 @@
-'use client';
+"use client";
 
-import { MapPin } from 'lucide-react';
-import { useBookingStore } from '@/store/bookingStore';
-import { LOCATIONS } from '@/data/mockData';
+import { MapPin } from "lucide-react";
+import { useCallback } from "react";
+import { useBookingStore } from "@/store/bookingStore";
+import { useLocations } from "@/hooks/useLocations";
+import { LOCATIONS } from "@/data/mockData";
+import { LocationSelect } from "./components/LocationSelect";
 
+/**
+ * Pickup and dropoff location selector with API integration
+ */
 export default function LocationSelector() {
   const { pickupLocation, dropoffLocation, setLocations } = useBookingStore();
+  const { data: apiLocations } = useLocations();
+  const locations =
+    apiLocations && apiLocations.length > 0
+      ? apiLocations.map((l) => l.name)
+      : LOCATIONS;
+
+  /**
+   * Handle pickup location change
+   */
+  const handlePickupChange = useCallback(
+    (value: string) => {
+      setLocations(value, dropoffLocation);
+    },
+    [dropoffLocation, setLocations],
+  );
+
+  /**
+   * Handle dropoff location change
+   */
+  const handleDropoffChange = useCallback(
+    (value: string) => {
+      setLocations(pickupLocation, value);
+    },
+    [pickupLocation, setLocations],
+  );
 
   return (
     <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-outline-variant/10 space-y-10">
@@ -17,28 +48,18 @@ export default function LocationSelector() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">Pickup Location</label>
-          <select 
-            value={pickupLocation}
-            onChange={(e) => setLocations(e.target.value, dropoffLocation)}
-            className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-2xl py-4 px-5 text-on-surface font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
-          >
-            <option value="">Select location</option>
-            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">Dropoff Location</label>
-          <select 
-            value={dropoffLocation}
-            onChange={(e) => setLocations(pickupLocation, e.target.value)}
-            className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-2xl py-4 px-5 text-on-surface font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
-          >
-            <option value="">Select location</option>
-            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-        </div>
+        <LocationSelect
+          label="Pickup Location"
+          value={pickupLocation}
+          onChange={handlePickupChange}
+          options={locations}
+        />
+        <LocationSelect
+          label="Dropoff Location"
+          value={dropoffLocation}
+          onChange={handleDropoffChange}
+          options={locations}
+        />
       </div>
     </div>
   );

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Heart, Star, MapPin, ArrowRight } from 'lucide-react';
-import { motion } from 'motion/react';
-import { Vehicle } from '@/types';
-import { formatPrice, cn } from '@/lib/utils';
-import BikeCard from './BikeCard';
-import Image from 'next/image';
+import Link from "next/link";
+import { Heart, Star, MapPin } from "lucide-react";
+import { motion } from "motion/react";
+import { Vehicle } from "@/types";
+import { formatPrice, cn } from "@/lib/utils";
+import BikeCard from "./BikeCard";
+import Image from "next/image";
 
 interface BikeGridProps {
   bikes: Vehicle[];
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
 }
 
 export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
@@ -19,10 +19,14 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
   }
 
   return (
-    <div className={cn(
-      "grid gap-8",
-      viewMode === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
-    )}>
+    <div
+      className={cn(
+        "grid gap-8",
+        viewMode === "grid"
+          ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          : "grid-cols-1",
+      )}
+    >
       {bikes.map((bike, index) => (
         <motion.div
           key={bike.id}
@@ -31,17 +35,19 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
           transition={{ delay: index * 0.05 }}
           className={cn(
             "group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 hover:border-primary/30 transition-all duration-300",
-            viewMode === 'grid' ? "flex flex-col" : "flex flex-col md:flex-row"
+            viewMode === "grid" ? "flex flex-col" : "flex flex-col md:flex-row",
           )}
         >
           {/* Image Container */}
-          <div className={cn(
-            "relative overflow-hidden",
-            viewMode === 'grid' ? "h-64" : "h-64 md:h-auto md:w-80 shrink-0"
-          )}>
-            <Image 
-              src={bike.image} 
-              alt={bike.name} 
+          <div
+            className={cn(
+              "relative overflow-hidden",
+              viewMode === "grid" ? "h-64" : "h-64 md:h-auto md:w-80 shrink-0",
+            )}
+          >
+            <Image
+              src={bike.image ?? ""}
+              alt={bike.name}
               width={800}
               height={600}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -72,17 +78,21 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
 
             <div className="flex items-center gap-1.5 text-secondary text-sm mb-6">
               <MapPin size={14} className="text-primary" />
-              <span>{bike.location || 'Vietnam'}</span>
+              <span>{bike.location || "Vietnam"}</span>
             </div>
 
             <div className="mt-auto pt-6 border-t border-outline-variant/10 flex justify-between items-center">
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-on-surface">{formatPrice(bike.pricePerDay)}</span>
-                  <span className="text-xs text-secondary font-medium">/day</span>
+                  <span className="text-2xl font-bold text-on-surface">
+                    {formatPrice(bike.pricePerDay)}
+                  </span>
+                  <span className="text-xs text-secondary font-medium">
+                    /day
+                  </span>
                 </div>
               </div>
-              <Link 
+              <Link
                 href={`/bikes/${bike.slug || bike.id}`}
                 className="bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-primary-container transition-colors shadow-md shadow-primary/10"
               >

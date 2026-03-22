@@ -3,9 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type VehicleStatus = 'available' | 'rented' | 'maintenance' | 'unavailable';
-export type VehicleType = 'manual' | 'automatic' | 'semi-automatic' | 'electric';
-export type VehicleCategory = 'scooter' | 'sport' | 'touring' | 'off-road' | 'classic';
+export type VehicleStatus =
+  | "available"
+  | "rented"
+  | "maintenance"
+  | "unavailable";
+export type VehicleTransmission =
+  | "manual"
+  | "automatic"
+  | "semi-automatic"
+  | "electric";
+export type VehicleCategory =
+  | "scooter"
+  | "sport"
+  | "touring"
+  | "off-road"
+  | "classic";
+
+// Backward compatibility alias
+export type VehicleType = VehicleTransmission;
 
 export interface Vehicle {
   id: string;
@@ -14,30 +30,53 @@ export interface Vehicle {
   brand: string;
   model: string;
   year: number;
-  type: VehicleType;
-  category: VehicleCategory;
-  engineSize: string;
   pricePerDay: number;
-  image: string;
-  images: string[];
-  status: VehicleStatus;
   description: string;
-  specs: {
-    fuelCapacity: string;
-    weight: string;
-    seatHeight: string;
-    topSpeed: string;
-  };
+  status: VehicleStatus;
+
+  // Transmission and fuel info
+  transmission: VehicleTransmission;
+  fuelType: string;
+
+  // Seat and license info
+  availableSeats: number;
+  licensePlate: string;
+
+  // Media
+  images: string[];
+
+  // Features and specs
   features: string[];
-  rating: number;
-  reviewCount: number;
+
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+
+  // Optional fields for UI
+  image?: string; // Primary image (first from images array)
+  type?: VehicleTransmission; // Alias for transmission
+  category?: VehicleCategory;
+  engineSize?: string;
+  specs?: {
+    fuelCapacity?: string;
+    weight?: string;
+    seatHeight?: string;
+    topSpeed?: string;
+  };
+  rating?: number;
+  reviewCount?: number;
   location?: string;
-  plate?: string;
   weeklyRate?: number;
   monthlyRate?: number;
+  relatedVehicles?: Vehicle[];
 }
 
-export type BookingStatus = 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "active"
+  | "completed"
+  | "cancelled";
 
 export interface BookingAddon {
   id: string;
@@ -59,7 +98,7 @@ export interface Booking {
   totalPrice: number;
   addons: string[];
   paymentMethod: string;
-  paymentStatus: 'pending' | 'paid' | 'refunded';
+  paymentStatus: "pending" | "paid" | "refunded";
   createdAt: string;
 }
 
@@ -74,27 +113,27 @@ export interface Customer {
   licenseImage?: string;
   avatar?: string;
   totalBookings: number;
-  status: 'active' | 'flagged' | 'blocked';
+  status: "active" | "flagged" | "blocked";
 }
 
 export interface Voucher {
   id: string;
   code: string;
-  discountType: 'percentage' | 'fixed';
+  discountType: "percentage" | "fixed";
   discountValue: number;
   minBookingValue: number;
   startDate: string;
   endDate: string;
   usageLimit: number;
   usageCount: number;
-  status: 'active' | 'expired' | 'disabled';
+  status: "active" | "expired" | "disabled";
 }
 
 export interface MaintenanceLog {
   id: string;
   vehicleId: string;
   date: string;
-  type: 'routine' | 'repair' | 'inspection';
+  type: "routine" | "repair" | "inspection";
   description: string;
   cost: number;
   technician: string;
@@ -103,7 +142,7 @@ export interface MaintenanceLog {
 export interface FinanceRecord {
   id: string;
   date: string;
-  type: 'revenue' | 'expense';
+  type: "revenue" | "expense";
   category: string;
   amount: number;
   description: string;

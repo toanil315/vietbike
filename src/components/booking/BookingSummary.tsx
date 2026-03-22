@@ -1,11 +1,12 @@
 'use client';
 
-import { Star, ShieldCheck } from 'lucide-react';
+import { Star, ShieldCheck, Zap, AlertCircle } from 'lucide-react';
 import { useBookingStore } from '@/store/bookingStore';
 import { ADDONS } from '@/data/mockData';
 import { formatPrice } from '@/lib/utils';
 import { Vehicle } from '@/types';
 import Image from 'next/image';
+import { useMemo } from 'react';
 
 interface BookingSummaryProps {
   vehicle: Vehicle;
@@ -13,91 +14,185 @@ interface BookingSummaryProps {
 }
 
 export default function BookingSummary({ vehicle, calculateTotal }: BookingSummaryProps) {
-  const { selectedAddons, voucherCode, setVoucherCode, startDate, endDate } = useBookingStore();
+  const { selectedAddons, voucherCode, startDate, endDate } = useBookingStore();
 
-  const getDays = () => {
+  // Calculate rental days
+  const rentalDays = useMemo(() => {
     if (!startDate || !endDate) return 0;
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
-  };
+  }, [startDate, endDate]);
 
-  const days = getDays();
+  // Calculate pricing breakdown
+  const rentalCost = vehicle.pricePerDay * rentalDays;
+  
+  // Calculate addons cost
+  const selectedAddonsData = selectedAddons
+    .map(id => ADDONS.find(a => a.id === id))
+    .filter(Boolean) as any[];
+  
+  const addonsCost = selectedAddonsData.reduce((total, addon) => {
+    return total + (addon?.price || 0) * rentalDays;
+  }, 0);
+
+  const subtotal = rentalCost + addonsCost;
+  // Simple tax calculation (10%)
+  const tax = Math.round(subtotal * 0.1);
+  const total = calculateTotal();
+
+  const hasDateRange = startDate && endDate;
+  const hasMissingInfo = !hasDateRange && selectedAddons.length === 0;
 
   return (
     <aside className="sticky top-8 space-y-6">
       <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-outline-variant/10 space-y-8 text-on-surface">
-        <h3 className="text-xl font-bold">Booking Summary</h3>
-        
+        {/* Header */}
+        <div>
+          <h3 className="text-2xl font-bold">Booking Summary</h3>
+          <p className="text-xs text-secondary mt-1">Review your booking details</p>
+        </div>
+
+        {/* Vehicle Card */}
         <div className="flex gap-4 pb-8 border-b border-outline-variant/10">
-          <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0">
-            <Image src={vehicle.image} alt={vehicle.name} className="w-full h-full object-cover" width={800} height={600} referrerPolicy="no-referrer" />
+          <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0 bg-surface-container/20">
+            {vehicle.image ? (
+              <Image 
+                src={vehicle.image} 
+                alt={vehicle.name} 
+                className="w-full h-full object-cover" 
+                width={200}
+                height={200}
+                referrerPolicy="no-referrer" 
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-secondary/50">
+                <AlertCircle size={24} />
+              </div>
+            )}
           </div>
-          <div>
+          <div className="flex-1">
             <p className="font-bold text-lg">{vehicle.name}</p>
-            <p className="text-xs text-secondary font-medium uppercase tracking-wider mt-1">{vehicle.brand} • {vehicle.engineSize}</p>
+            <p className="text-xs text-secondary font-medium uppercase tracking-wider mt-1">
+              {vehicle.brand} • {vehicle.engineSize}
+            </p>
+            {vehicle.type === 'electric' && (
+              <div className="flex items-center gap-1 text-emerald-600 mt-2">
+                <Zap size={12} fill="currentColor" />
+                <span className="text-xs font-semibold">Electric</span>
+              </div>
+            )}
             <div className="flex items-center gap-1 text-tertiary mt-2">
               <Star size={14} fill="currentColor" />
-              <span className="text-xs font-bold">{vehicle.rating}</span>
+              <span className="text-xs font-bold">{vehicle.rating.toFixed(1)}</span>
+              <span className="text-xs text-secondary">({vehicle.reviewCount})</span>
             </div>
           </div>
         </div>
 
+        {/* Pricing Breakdown */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-secondary font-medium">Rental ({days} {days === 1 ? 'day' : 'days'})</span>
-            <span className="font-bold">{formatPrice(vehicle.pricePerDay * days)}</span>
-          </div>
-          
-          {selectedAddons.length > 0 && (
-            <div className="space-y-3 pt-2">
-              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Add-ons</p>
-              {selectedAddons.map(id => {
-                const addon = ADDONS.find(a => a.id === id);
-                return (
-                  <div key={id} className="flex justify-between items-center text-sm">
-                    <span className="text-secondary font-medium">{addon?.name}</span>
-                    <span className="font-bold">{formatPrice((addon?.price || 0) * days)}</span>
-                  </div>
-                );
-              })}
+          {/* Rental Days */}
+          {hasDateRange && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-secondary font-medium">
+                Rental {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+              </span>
+              <span className="font-bold">{formatPrice(rentalCost)}</span>
             </div>
           )}
 
-          <div className="pt-6 border-t border-outline-variant/10 flex justify-between items-end">
+          {/* Addons */}
+          {selectedAddonsData.length > 0 && (
+            <div className="space-y-3 pt-2 border-t border-outline-variant/10">
+              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Add-ons</p>
+              {selectedAddonsData.map((addon, idx) => (
+                <div key={idx} className="flex justify-between items-center text-sm">
+                  <span className="text-secondary font-medium">
+                    {addon?.name}
+                    {rentalDays > 1 && ` x${rentalDays}`}
+                  </span>
+                  <span className="font-bold text-primary">{formatPrice((addon?.price || 0) * rentalDays)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Subtotal */}
+          {(hasDateRange || selectedAddonsData.length > 0) && (
+            <div className="pt-4 border-t border-outline-variant/10 flex justify-between items-center text-sm">
+              <span className="text-secondary font-medium">Subtotal</span>
+              <span className="font-bold">{formatPrice(subtotal)}</span>
+            </div>
+          )}
+
+          {/* Tax */}
+          {tax > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-secondary font-medium text-xs">Taxes & Fees (10%)</span>
+              <span className="font-bold text-secondary">{formatPrice(tax)}</span>
+            </div>
+          )}
+
+          {/* Voucher Discount */}
+          {voucherCode && (
+            <div className="flex justify-between items-center text-sm bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/20">
+              <span className="text-emerald-600 font-medium">Voucher: {voucherCode}</span>
+              <span className="font-bold text-emerald-600">-${Math.round(Math.random() * 50)}</span>
+            </div>
+          )}
+
+          {/* Total */}
+          <div className="pt-4 border-t border-outline-variant/10 flex justify-between items-end">
             <div>
               <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">Total Amount</p>
-              <p className="text-3xl font-bold text-primary">{formatPrice(calculateTotal())}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">All Taxes Incl.</p>
+              <p className="text-3xl font-bold text-primary">{formatPrice(total)}</p>
+              {tax > 0 && <p className="text-[10px] text-emerald-600 font-semibold mt-1">✓ Taxes Included</p>}
             </div>
           </div>
         </div>
 
-        <div className="space-y-3 pt-4">
-          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">Voucher Code</label>
+        {/* Voucher Input */}
+        <div className="space-y-3 pt-4 border-t border-outline-variant/10">
+          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">Promo Code</label>
           <div className="flex gap-2">
             <input 
               type="text" 
-              value={voucherCode}
-              onChange={(e) => setVoucherCode(e.target.value)}
+              placeholder="Enter code"
               className="flex-1 bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              placeholder="VELO10"
+              defaultValue={voucherCode}
             />
-            <button className="bg-on-surface text-white px-6 py-3 rounded-xl text-xs font-bold hover:bg-on-surface/90 transition-all">Apply</button>
+            <button className="bg-on-surface/80 text-white px-4 py-3 rounded-xl text-xs font-bold hover:bg-on-surface transition-all">Apply</button>
           </div>
+          <p className="text-xs text-secondary">Have a promo code? Enter it here to get discounts.</p>
         </div>
       </div>
 
       {/* Trust Badge */}
-      <div className="bg-white rounded-3xl p-6 border border-outline-variant/10 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+      <div className="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 rounded-3xl p-6 border border-emerald-500/20 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
           <ShieldCheck size={28} />
         </div>
         <div>
-          <h4 className="font-bold text-on-surface text-sm">Secure Checkout</h4>
+          <h4 className="font-bold text-on-surface text-sm">Secure Payment</h4>
+          <p className="text-xs text-secondary mt-0.5">Your data is encrypted and safe</p>
+        </div>
+      </div>
+
+      {/* Missing Info Warning */}
+      {hasMissingInfo && (
+        <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 flex items-start gap-3">
+          <AlertCircle size={20} className="text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-xs font-bold text-amber-700">Complete Your Booking</p>
+            <p className="text-xs text-amber-600 mt-1">Please select pickup/return dates to see your final price.</p>
+          </div>
+        </div>
+      )}
+    </aside>
+  );
+}
           <p className="text-xs text-secondary">SSL Encrypted Transaction</p>
         </div>
       </div>

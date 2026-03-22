@@ -179,7 +179,6 @@ export function useVehicleById(id: string) {
 
         setData(response);
       } catch (err) {
-        console.log(err);
         const appError = handleApiError(err);
         setError(appError);
       } finally {

@@ -100,7 +100,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: primaryImage
         ? [
             {
-              url: primaryImage,
+              url: primaryImage.url,
               width: 1200,
               height: 800,
               alt: bike.name,
@@ -221,7 +221,10 @@ export default async function BikeDetailPage({ params }: Props) {
           <article className="lg:col-span-7 space-y-12">
             {/* Gallery with Images */}
             {allImages.length > 0 ? (
-              <BikeGallery images={allImages} name={bike.name} />
+              <BikeGallery
+                images={allImages.map((img) => img.url)}
+                name={bike.name}
+              />
             ) : (
               <div className="aspect-video rounded-[2.5rem] bg-white border border-outline-variant/10 flex items-center justify-center">
                 <div className="text-center">
@@ -278,7 +281,9 @@ export default async function BikeDetailPage({ params }: Props) {
 
               {/* Features List */}
               {bike.features && bike.features.length > 0 && (
-                <BikeFeatures features={bike.features} />
+                <BikeFeatures
+                  features={bike.features.map((feature) => feature.featureName)}
+                />
               )}
             </div>
           </article>

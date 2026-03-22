@@ -1,20 +1,30 @@
-'use client';
+"use client";
 
-import { Star, ShieldCheck, Zap, AlertCircle } from 'lucide-react';
-import { useBookingStore } from '@/store/bookingStore';
-import { ADDONS } from '@/data/mockData';
-import { formatPrice } from '@/lib/utils';
-import { Vehicle } from '@/types';
-import Image from 'next/image';
-import { useMemo } from 'react';
+import { Star, ShieldCheck, Zap, AlertCircle } from "lucide-react";
+import { useBookingStore } from "@/store/bookingStore";
+import { ADDONS } from "@/data/mockData";
+import { formatPrice } from "@/lib/utils";
+import { Vehicle } from "@/types";
+import Image from "next/image";
+import { useMemo, useEffect, useState } from "react";
 
 interface BookingSummaryProps {
   vehicle: Vehicle;
   calculateTotal: () => number;
 }
 
-export default function BookingSummary({ vehicle, calculateTotal }: BookingSummaryProps) {
-  const { selectedAddons, voucherCode, startDate, endDate } = useBookingStore();
+export default function BookingSummary({
+  vehicle,
+  calculateTotal,
+}: BookingSummaryProps) {
+  const { selectedAddons, voucherCode, startDate, endDate, discountAmount } =
+    useBookingStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Ensure hydration match
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Calculate rental days
   const rentalDays = useMemo(() => {
@@ -27,12 +37,12 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
 
   // Calculate pricing breakdown
   const rentalCost = vehicle.pricePerDay * rentalDays;
-  
+
   // Calculate addons cost
   const selectedAddonsData = selectedAddons
-    .map(id => ADDONS.find(a => a.id === id))
+    .map((id) => ADDONS.find((a) => a.id === id))
     .filter(Boolean) as any[];
-  
+
   const addonsCost = selectedAddonsData.reduce((total, addon) => {
     return total + (addon?.price || 0) * rentalDays;
   }, 0);
@@ -51,20 +61,22 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
         {/* Header */}
         <div>
           <h3 className="text-2xl font-bold">Booking Summary</h3>
-          <p className="text-xs text-secondary mt-1">Review your booking details</p>
+          <p className="text-xs text-secondary mt-1">
+            Review your booking details
+          </p>
         </div>
 
         {/* Vehicle Card */}
         <div className="flex gap-4 pb-8 border-b border-outline-variant/10">
           <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0 bg-surface-container/20">
             {vehicle.image ? (
-              <Image 
-                src={vehicle.image} 
-                alt={vehicle.name} 
-                className="w-full h-full object-cover" 
+              <img
+                src={vehicle.image}
+                alt={vehicle.name}
+                className="w-full h-full object-cover"
                 width={200}
                 height={200}
-                referrerPolicy="no-referrer" 
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-secondary/50">
@@ -77,7 +89,7 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
             <p className="text-xs text-secondary font-medium uppercase tracking-wider mt-1">
               {vehicle.brand} • {vehicle.engineSize}
             </p>
-            {vehicle.type === 'electric' && (
+            {vehicle.type === "electric" && (
               <div className="flex items-center gap-1 text-emerald-600 mt-2">
                 <Zap size={12} fill="currentColor" />
                 <span className="text-xs font-semibold">Electric</span>
@@ -85,8 +97,12 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
             )}
             <div className="flex items-center gap-1 text-tertiary mt-2">
               <Star size={14} fill="currentColor" />
-              <span className="text-xs font-bold">{vehicle.rating.toFixed(1)}</span>
-              <span className="text-xs text-secondary">({vehicle.reviewCount})</span>
+              <span className="text-xs font-bold">
+                {vehicle?.rating?.toFixed(1)}
+              </span>
+              <span className="text-xs text-secondary">
+                ({vehicle?.reviewCount})
+              </span>
             </div>
           </div>
         </div>
@@ -97,7 +113,7 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
           {hasDateRange && (
             <div className="flex justify-between items-center text-sm">
               <span className="text-secondary font-medium">
-                Rental {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+                Rental {rentalDays} {rentalDays === 1 ? "day" : "days"}
               </span>
               <span className="font-bold">{formatPrice(rentalCost)}</span>
             </div>
@@ -106,14 +122,21 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
           {/* Addons */}
           {selectedAddonsData.length > 0 && (
             <div className="space-y-3 pt-2 border-t border-outline-variant/10">
-              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Add-ons</p>
+              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">
+                Add-ons
+              </p>
               {selectedAddonsData.map((addon, idx) => (
-                <div key={idx} className="flex justify-between items-center text-sm">
+                <div
+                  key={idx}
+                  className="flex justify-between items-center text-sm"
+                >
                   <span className="text-secondary font-medium">
                     {addon?.name}
                     {rentalDays > 1 && ` x${rentalDays}`}
                   </span>
-                  <span className="font-bold text-primary">{formatPrice((addon?.price || 0) * rentalDays)}</span>
+                  <span className="font-bold text-primary">
+                    {formatPrice((addon?.price || 0) * rentalDays)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -130,42 +153,64 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
           {/* Tax */}
           {tax > 0 && (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-secondary font-medium text-xs">Taxes & Fees (10%)</span>
-              <span className="font-bold text-secondary">{formatPrice(tax)}</span>
+              <span className="text-secondary font-medium text-xs">
+                Taxes & Fees (10%)
+              </span>
+              <span className="font-bold text-secondary">
+                {formatPrice(tax)}
+              </span>
             </div>
           )}
 
           {/* Voucher Discount */}
-          {voucherCode && (
+          {voucherCode && isHydrated && (
             <div className="flex justify-between items-center text-sm bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/20">
-              <span className="text-emerald-600 font-medium">Voucher: {voucherCode}</span>
-              <span className="font-bold text-emerald-600">-${Math.round(Math.random() * 50)}</span>
+              <span className="text-emerald-600 font-medium">
+                Voucher: {voucherCode}
+              </span>
+              <span className="font-bold text-emerald-600">
+                -{formatPrice(discountAmount || 0)}
+              </span>
             </div>
           )}
 
           {/* Total */}
           <div className="pt-4 border-t border-outline-variant/10 flex justify-between items-end">
             <div>
-              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">Total Amount</p>
-              <p className="text-3xl font-bold text-primary">{formatPrice(total)}</p>
-              {tax > 0 && <p className="text-[10px] text-emerald-600 font-semibold mt-1">✓ Taxes Included</p>}
+              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">
+                Total Amount
+              </p>
+              <p className="text-3xl font-bold text-primary">
+                {formatPrice(total)}
+              </p>
+              {tax > 0 && (
+                <p className="text-[10px] text-emerald-600 font-semibold mt-1">
+                  ✓ Taxes Included
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         {/* Voucher Input */}
         <div className="space-y-3 pt-4 border-t border-outline-variant/10">
-          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">Promo Code</label>
+          <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">
+            Promo Code
+          </label>
           <div className="flex gap-2">
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Enter code"
               className="flex-1 bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               defaultValue={voucherCode}
             />
-            <button className="bg-on-surface/80 text-white px-4 py-3 rounded-xl text-xs font-bold hover:bg-on-surface transition-all">Apply</button>
+            <button className="bg-on-surface/80 text-white px-4 py-3 rounded-xl text-xs font-bold hover:bg-on-surface transition-all">
+              Apply
+            </button>
           </div>
-          <p className="text-xs text-secondary">Have a promo code? Enter it here to get discounts.</p>
+          <p className="text-xs text-secondary">
+            Have a promo code? Enter it here to get discounts.
+          </p>
         </div>
       </div>
 
@@ -176,7 +221,9 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
         </div>
         <div>
           <h4 className="font-bold text-on-surface text-sm">Secure Payment</h4>
-          <p className="text-xs text-secondary mt-0.5">Your data is encrypted and safe</p>
+          <p className="text-xs text-secondary mt-0.5">
+            Your data is encrypted and safe
+          </p>
         </div>
       </div>
 
@@ -185,17 +232,15 @@ export default function BookingSummary({ vehicle, calculateTotal }: BookingSumma
         <div className="bg-amber-500/10 rounded-2xl p-4 border border-amber-500/20 flex items-start gap-3">
           <AlertCircle size={20} className="text-amber-600 mt-0.5 shrink-0" />
           <div>
-            <p className="text-xs font-bold text-amber-700">Complete Your Booking</p>
-            <p className="text-xs text-amber-600 mt-1">Please select pickup/return dates to see your final price.</p>
+            <p className="text-xs font-bold text-amber-700">
+              Complete Your Booking
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              Please select pickup/return dates to see your final price.
+            </p>
           </div>
         </div>
       )}
-    </aside>
-  );
-}
-          <p className="text-xs text-secondary">SSL Encrypted Transaction</p>
-        </div>
-      </div>
     </aside>
   );
 }

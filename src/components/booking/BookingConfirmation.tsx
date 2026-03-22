@@ -213,7 +213,7 @@ Contact: support@vietbike.com | +84 1234 567 890
                 {displayVehicle ? (
                   <div className="flex gap-4">
                     <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0 bg-surface-container/20">
-                      <Image
+                      <img
                         src={displayVehicle.image}
                         alt={displayVehicle.name}
                         className="w-full h-full object-cover"

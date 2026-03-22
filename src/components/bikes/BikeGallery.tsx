@@ -65,14 +65,13 @@ export default function BikeGallery({
             className="w-full h-full"
             suppressHydrationWarning
           >
-            <Image
+            <img
               src={images[activeImage]}
               alt={`${name} - Image ${activeImage + 1}`}
               width={1200}
               height={800}
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
-              priority={activeImage === 0}
             />
           </motion.div>
         </AnimatePresence>
@@ -157,7 +156,7 @@ export default function BikeGallery({
                   : "border-transparent opacity-70 hover:opacity-100",
               )}
             >
-              <Image
+              <img
                 src={img}
                 alt={`${name} - Thumbnail ${i + 1}`}
                 className="w-full h-full object-cover"

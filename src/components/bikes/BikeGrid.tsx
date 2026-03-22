@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Heart, Star, MapPin } from "lucide-react";
 import { motion } from "motion/react";
+import { useState, useEffect } from "react";
 import { Vehicle } from "@/types";
 import { formatPrice, cn } from "@/lib/utils";
 import BikeCard from "./BikeCard";
@@ -14,6 +15,12 @@ interface BikeGridProps {
 }
 
 export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   if (bikes.length === 0) {
     return null; // The parent component handles empty state
   }
@@ -30,9 +37,10 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
       {bikes.map((bike, index) => (
         <motion.div
           key={bike.id}
-          initial={{ opacity: 0, y: 20 }}
+          initial={isHydrated ? { opacity: 0, y: 20 } : false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
+          transition={isHydrated ? { delay: index * 0.05 } : undefined}
+          suppressHydrationWarning
           className={cn(
             "group bg-white rounded-3xl overflow-hidden border border-outline-variant/10 hover:border-primary/30 transition-all duration-300",
             viewMode === "grid" ? "flex flex-col" : "flex flex-col md:flex-row",
@@ -45,14 +53,13 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
               viewMode === "grid" ? "h-64" : "h-64 md:h-auto md:w-80 shrink-0",
             )}
           >
-            <Image
-              src={bike.image ?? ""}
+            <img
+              src={bike.images[0]?.url ?? ""}
               alt={bike.name}
               width={800}
               height={600}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"
-              priority={index === 0}
             />
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-bold text-primary uppercase tracking-wider shadow-sm">

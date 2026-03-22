@@ -23,6 +23,18 @@ export type VehicleCategory =
 // Backward compatibility alias
 export type VehicleType = VehicleTransmission;
 
+export interface VehicleImage {
+  id: string;
+  url: string;
+  altText?: string;
+  displayOrder: number;
+}
+
+export interface VehicleFeature {
+  featureName: string;
+  featureValue: string;
+}
+
 export interface Vehicle {
   id: string;
   slug: string;
@@ -43,10 +55,10 @@ export interface Vehicle {
   licensePlate: string;
 
   // Media
-  images: string[];
+  images: VehicleImage[];
 
   // Features and specs
-  features: string[];
+  features: VehicleFeature[];
 
   // Timestamps
   createdAt: string;

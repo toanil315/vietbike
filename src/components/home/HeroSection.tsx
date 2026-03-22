@@ -1,22 +1,21 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
-import { motion } from 'motion/react';
-import Image from 'next/image';
+import Link from "next/link";
+import { ArrowRight, Play } from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
 
 export default function HeroSection() {
   return (
     <section className="relative h-[90vh] flex items-center overflow-hidden bg-on-surface">
       <div className="absolute inset-0 z-0">
-        <Image
+        <img
           src="https://picsum.photos/seed/vietnam-road-trip/1920/1080"
           alt="Vietnam Road"
           width={1920}
           height={1080}
           className="w-full h-full object-cover opacity-60"
           referrerPolicy="no-referrer"
-          priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/40 to-transparent"></div>
       </div>

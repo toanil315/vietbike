@@ -214,7 +214,7 @@ export default function VehicleTable() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl overflow-hidden border border-outline-variant/10 shrink-0">
-                        <Image
+                        <img
                           src={vehicle.image}
                           alt={vehicle.name}
                           className="w-full h-full object-cover"
@@ -239,12 +239,7 @@ export default function VehicleTable() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-on-surface">
-                    {/* Mock plate number as it's not in the type */}
-                    {Math.floor(Math.random() * 90 + 10)}-
-                    {String.fromCharCode(65 + Math.floor(Math.random() * 26))}
-                    {Math.floor(Math.random() * 9 + 1)}{" "}
-                    {Math.floor(Math.random() * 900 + 100)}.
-                    {Math.floor(Math.random() * 90 + 10)}
+                    {vehicle.licensePlate || "N/A"}
                   </td>
                   <td className="px-6 py-4 text-sm text-secondary">
                     {vehicle.location?.split(",")[0] || "N/A"}

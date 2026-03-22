@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { useVehicles } from "@/hooks/useVehicles";
-import { VEHICLES } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import BikeFilterBar from "@/components/bikes/BikeFilterBar";
 import BikeGrid from "@/components/bikes/BikeGrid";
@@ -33,116 +32,80 @@ export default function BikesClient() {
     priceMax: priceRange * 100000,
   });
 
-  return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
-        <BikeFilterBar
-          city={city}
-          setCity={setCity}
-          type={type}
-          setType={setType}
-          brand={brand}
-          setBrand={setBrand}
-          transmission={transmission}
-          setTransmission={setTransmission}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-        />
-      </div>
+  function renderVehicleCards() {
+    if (isLoading) {
+      return <VehiclesLoading />;
+    }
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-6 flex justify-between items-center">
-        <p className="text-sm text-secondary">
-          {isLoading ? (
-            <span>Loading bikes...</span>
-          ) : error ? null : (
-            <>
-              Showing{" "}
-              <span className="font-bold text-on-surface">
-                {vehicles.length}
-              </span>{" "}
-              of{" "}
-              <span className="font-bold text-on-surface">
-                {vehicles.length}
-              </span>{" "}
-              bikes
-            </>
-          )}
+    if (error) {
+      return <VehiclesError error={error} />;
+    }
+
+    if (vehicles.length > 0) {
+      return <BikeGrid bikes={vehicles} viewMode={viewMode} />;
+    }
+
+    return renderNoResults();
+  }
+
+  function renderNoResults() {
+    return (
+      <div className="bg-white rounded-3xl p-20 text-center border border-outline-variant/10">
+        <h3 className="text-2xl font-bold mb-2">No motorbikes found</h3>
+        <p className="text-secondary">
+          Try adjusting your filters to find your perfect ride.
         </p>
-        <div className="flex bg-white p-1 rounded-lg border border-outline-variant/10 shadow-sm">
-          <button
-            onClick={() => setViewMode("grid")}
-            className={cn(
-              "p-2 rounded-md transition-all",
-              viewMode === "grid"
-                ? "bg-primary text-white"
-                : "text-secondary hover:bg-surface-container",
-            )}
-            title="Grid view"
-          >
-            <LayoutGrid size={18} />
-          </button>
-          <button
-            onClick={() => setViewMode("list")}
-            className={cn(
-              "p-2 rounded-md transition-all",
-              viewMode === "list"
-                ? "bg-primary text-white"
-                : "text-secondary hover:bg-surface-container",
-            )}
-            title="List view"
-          >
-            <List size={18} />
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            setCity("All Cities");
+            setType("Select Types");
+            setBrand("Any Brand");
+            setPriceRange(250);
+          }}
+          className="mt-8 text-primary font-bold hover:underline py-2 px-4 rounded"
+        >
+          Clear all filters
+        </button>
       </div>
+    );
+  }
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-surface-container rounded-2xl h-64 animate-pulse"
-              />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="bg-white rounded-3xl p-20 text-center border border-outline-variant/10">
-            <h3 className="text-2xl font-bold mb-2">Failed to load bikes</h3>
-            <p className="text-secondary mb-8">{error.userMessage}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="text-primary font-bold hover:underline py-2 px-4 rounded"
-            >
-              Try again
-            </button>
-          </div>
-        ) : vehicles.length > 0 ? (
-          <BikeGrid bikes={vehicles} viewMode={viewMode} />
-        ) : (
-          <div className="bg-white rounded-3xl p-20 text-center border border-outline-variant/10">
-            <h3 className="text-2xl font-bold mb-2">No motorbikes found</h3>
-            <p className="text-secondary">
-              Try adjusting your filters to find your perfect ride.
-            </p>
-            <button
-              onClick={() => {
-                setCity("All Cities");
-                setType("Select Types");
-                setBrand("Any Brand");
-                setPriceRange(250);
-              }}
-              className="mt-8 text-primary font-bold hover:underline py-2 px-4 rounded"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
+  function renderViewModeToggle() {
+    return (
+      <div className="flex bg-white p-1 rounded-lg border border-outline-variant/10 shadow-sm">
+        <button
+          onClick={() => setViewMode("grid")}
+          className={cn(
+            "p-2 rounded-md transition-all",
+            viewMode === "grid"
+              ? "bg-primary text-white"
+              : "text-secondary hover:bg-surface-container",
+          )}
+          title="Grid view"
+        >
+          <LayoutGrid size={18} />
+        </button>
+        <button
+          onClick={() => setViewMode("list")}
+          className={cn(
+            "p-2 rounded-md transition-all",
+            viewMode === "list"
+              ? "bg-primary text-white"
+              : "text-secondary hover:bg-surface-container",
+          )}
+          title="List view"
+        >
+          <List size={18} />
+        </button>
       </div>
+    );
+  }
 
-      {vehicles.length > 0 && pagination && pagination.pages > 1 && (
+  function renderPagination() {
+    return (
+      vehicles.length > 0 &&
+      pagination &&
+      pagination.pages > 1 && (
         <div className="max-w-7xl mx-auto px-4 md:px-8 mt-16 flex justify-center">
           <div className="flex items-center gap-2">
             <button
@@ -194,7 +157,66 @@ export default function BikesClient() {
             </button>
           </div>
         </div>
-      )}
+      )
+    );
+  }
+
+  return (
+    <>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
+        <BikeFilterBar
+          city={city}
+          setCity={setCity}
+          type={type}
+          setType={setType}
+          brand={brand}
+          setBrand={setBrand}
+          transmission={transmission}
+          setTransmission={setTransmission}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          priceRange={priceRange}
+          setPriceRange={setPriceRange}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-6 flex justify-between items-center">
+        {renderViewModeToggle()}
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {renderVehicleCards()}
+      </div>
+
+      {renderPagination()}
     </>
+  );
+}
+
+function VehiclesLoading() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(8)].map((_, i) => (
+        <div
+          key={i}
+          className="bg-surface-container rounded-2xl h-64 animate-pulse"
+        />
+      ))}
+    </div>
+  );
+}
+
+function VehiclesError({ error }: { error: any }) {
+  return (
+    <div className="bg-white rounded-3xl p-20 text-center border border-outline-variant/10">
+      <h3 className="text-2xl font-bold mb-2">Failed to load bikes</h3>
+      <p className="text-secondary mb-8">{error.userMessage}</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="text-primary font-bold hover:underline py-2 px-4 rounded"
+      >
+        Try again
+      </button>
+    </div>
   );
 }

@@ -48,7 +48,7 @@ export default function BikeCard({
   }
 
   // Primary image with fallback to first image in array
-  const primaryImage = bike.image || bike.images?.[0];
+  const primaryImage = bike.images?.[0];
   const topFeatures = bike.features?.slice(0, 2) || [];
   const hasElectric = bike.type === "electric";
 
@@ -66,14 +66,13 @@ export default function BikeCard({
         {/* Image Section with Badge */}
         <div className="relative h-56 overflow-hidden bg-surface-container/20">
           {primaryImage ? (
-            <Image
-              src={primaryImage}
+            <img
+              src={primaryImage.url}
               alt={bike.name}
               width={400}
               height={300}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"
-              priority={index === 0}
             />
           ) : (
             <div className="w-full h-full bg-surface-container/20 flex items-center justify-center">
@@ -116,7 +115,7 @@ export default function BikeCard({
             <div className="flex items-center gap-1 text-tertiary shrink-0">
               <Star size={14} fill="currentColor" />
               <span className="text-xs font-bold">
-                {bike.rating.toFixed(1)}
+                {bike.rating?.toFixed(1)}
               </span>
             </div>
           </div>
@@ -140,7 +139,7 @@ export default function BikeCard({
                   key={idx}
                   className="inline-block bg-primary/10 text-primary text-[10px] font-semibold px-2 py-1 rounded-md"
                 >
-                  {feature}
+                  {feature.featureName}
                 </span>
               ))}
             </div>

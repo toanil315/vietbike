@@ -1,4 +1,21 @@
-import { Vehicle, Customer, Voucher, Booking } from "../types";
+import { Vehicle, Customer, Voucher, BookingStatus } from "../types";
+
+export interface MockBooking {
+  id: string;
+  referenceNumber: string;
+  vehicleId: string;
+  customerId: string;
+  startDate: string;
+  endDate: string;
+  pickupLocation: string;
+  dropoffLocation: string;
+  status: BookingStatus;
+  totalPrice: number;
+  addons: string[];
+  paymentMethod: string;
+  paymentStatus: "pending" | "paid" | "refunded";
+  createdAt: string;
+}
 
 export const VEHICLES: Vehicle[] = [];
 
@@ -52,7 +69,7 @@ export const CUSTOMERS: Customer[] = [
   },
 ];
 
-export const BOOKINGS: Booking[] = [
+export const BOOKINGS: MockBooking[] = [
   {
     id: "b1",
     referenceNumber: "VB-9402",

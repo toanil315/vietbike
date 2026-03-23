@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Star, MapPin } from "lucide-react";
+import { Heart, MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { Vehicle } from "@/types";
@@ -77,15 +77,11 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
               <h3 className="text-xl font-bold text-on-surface group-hover:text-primary transition-colors">
                 {bike.name}
               </h3>
-              <div className="flex items-center gap-1 bg-tertiary/10 px-2 py-1 rounded-lg text-tertiary">
-                <Star size={14} fill="currentColor" />
-                <span className="text-xs font-bold">{bike.rating}</span>
-              </div>
             </div>
 
             <div className="flex items-center gap-1.5 text-secondary text-sm mb-6">
               <MapPin size={14} className="text-primary" />
-              <span>{bike.location || "Vietnam"}</span>
+              <span>Vietnam</span>
             </div>
 
             <div className="mt-auto pt-6 border-t border-outline-variant/10 flex justify-between items-center">

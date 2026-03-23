@@ -134,8 +134,8 @@ export function useAdminDeleteVehicle() {
       setIsLoading(true);
       setError(null);
 
-      const endpoint = adminVehicleEndpoints.delete(vehicleId);
-      await apiClient.delete(endpoint);
+      const endpoint = adminVehicleEndpoints.updateStatus(vehicleId);
+      await apiClient.patch(endpoint, { status: "unavailable" });
 
       return true;
     } catch (err) {

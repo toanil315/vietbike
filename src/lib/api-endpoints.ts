@@ -27,22 +27,10 @@ export const vehicleEndpoints = {
   byId: (id: string) => `/public/vehicles/${id}`,
 
   /**
-   * GET /public/vehicles/slug/:slug
+   * GET /public/vehicles/by-slug/:slug
    * Fetch single vehicle by slug with full details
    */
   bySlug: (slug: string) => `/public/vehicles/by-slug/${slug}`,
-
-  /**
-   * GET /public/vehicles/:id/images
-   * Fetch images for a vehicle
-   */
-  images: (vehicleId: string) => `/public/vehicles/${vehicleId}/images`,
-
-  /**
-   * GET /public/vehicles/:id/features
-   * Fetch features for a vehicle
-   */
-  features: (vehicleId: string) => `/public/vehicles/${vehicleId}/features`,
 };
 
 // ============================================================================
@@ -63,23 +51,11 @@ export const bookingEndpoints = {
   getByReference: (reference: string) => `/public/bookings/${reference}`,
 
   /**
-   * GET /public/bookings/me
-   * Fetch all bookings for current customer (requires auth)
-   * Query params: page, limit, status
+   * GET /public/bookings/my-bookings/:customerId
+   * Fetch bookings for a customer id with pagination query
    */
-  myBookings: () => "/public/bookings/me",
-
-  /**
-   * PATCH /public/bookings/:id/settlement-status
-   * Update booking settlement status (payment confirmation)
-   */
-  updateSettlement: (id: string) => `/public/bookings/${id}/settlement-status`,
-
-  /**
-   * PATCH /public/bookings/:id/cancel
-   * Cancel a booking
-   */
-  cancel: (id: string) => `/public/bookings/${id}/cancel`,
+  myBookings: (customerId: string) =>
+    `/public/bookings/my-bookings/${customerId}`,
 };
 
 // ============================================================================
@@ -174,16 +150,10 @@ export const adminVehicleEndpoints = {
   detail: (id: string) => `/admin/vehicles/${id}`,
 
   /**
-   * PUT /admin/vehicles/:id
+   * PATCH /admin/vehicles/:id
    * Update vehicle details
    */
   update: (id: string) => `/admin/vehicles/${id}`,
-
-  /**
-   * DELETE /admin/vehicles/:id
-   * Delete vehicle (soft delete)
-   */
-  delete: (id: string) => `/admin/vehicles/${id}`,
 
   /**
    * POST /admin/vehicles/:id/images
@@ -203,6 +173,22 @@ export const adminVehicleEndpoints = {
    * Change vehicle status (available, maintenance, etc)
    */
   updateStatus: (id: string) => `/admin/vehicles/${id}/status`,
+
+  /**
+   * PATCH /admin/vehicles/:id/images/reorder
+   */
+  reorderImages: (id: string) => `/admin/vehicles/${id}/images/reorder`,
+
+  /**
+   * POST /admin/vehicles/:id/features
+   */
+  addFeature: (id: string) => `/admin/vehicles/${id}/features`,
+
+  /**
+   * DELETE /admin/vehicles/:id/features/:featureId
+   */
+  deleteFeature: (id: string, featureId: string) =>
+    `/admin/vehicles/${id}/features/${featureId}`,
 };
 
 // ============================================================================
@@ -217,40 +203,16 @@ export const adminBookingEndpoints = {
   list: () => "/admin/bookings",
 
   /**
-   * GET /admin/bookings/:id
-   * Get booking details
+   * GET /admin/bookings/:reference
+   * Get booking details by reference
    */
-  detail: (id: string) => `/admin/bookings/${id}`,
-
-  /**
-   * POST /admin/bookings
-   * Create booking on behalf of customer (admin)
-   */
-  create: () => "/admin/bookings",
-
-  /**
-   * PUT /admin/bookings/:id
-   * Update booking
-   */
-  update: (id: string) => `/admin/bookings/${id}`,
+  detail: (reference: string) => `/admin/bookings/${reference}`,
 
   /**
    * PATCH /admin/bookings/:id/status
    * Update booking status
    */
   updateStatus: (id: string) => `/admin/bookings/${id}/status`,
-
-  /**
-   * DELETE /admin/bookings/:id
-   * Cancel booking (admin)
-   */
-  cancel: (id: string) => `/admin/bookings/${id}`,
-
-  /**
-   * POST /admin/bookings/:id/refund
-   * Refund a booking
-   */
-  refund: (id: string) => `/admin/bookings/${id}/refund`,
 };
 
 // ============================================================================

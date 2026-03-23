@@ -41,13 +41,7 @@ export default function VehicleTable() {
     searchTerms: search ? [search] : undefined,
   });
 
-  // Filter vehicles by location on client side
-  const filteredVehicles = useMemo(() => {
-    if (!locationFilter) return vehicles;
-    return vehicles.filter((vehicle) =>
-      vehicle.location?.toLowerCase().includes(locationFilter.toLowerCase()),
-    );
-  }, [vehicles, locationFilter]);
+  const filteredVehicles = useMemo(() => vehicles, [vehicles]);
 
   const statusColors: Record<VehicleStatus, string> = {
     available: "bg-emerald-100 text-emerald-700",
@@ -215,7 +209,10 @@ export default function VehicleTable() {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl overflow-hidden border border-outline-variant/10 shrink-0">
                         <img
-                          src={vehicle.image}
+                          src={
+                            vehicle.images?.[0]?.url ||
+                            "https://picsum.photos/seed/vehicle/200/200"
+                          }
                           alt={vehicle.name}
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
@@ -241,9 +238,7 @@ export default function VehicleTable() {
                   <td className="px-6 py-4 text-sm font-medium text-on-surface">
                     {vehicle.licensePlate || "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-secondary">
-                    {vehicle.location?.split(",")[0] || "N/A"}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-secondary">N/A</td>
                   <td className="px-6 py-4 text-sm font-bold text-on-surface text-right">
                     {formatPrice(vehicle.pricePerDay)}
                   </td>

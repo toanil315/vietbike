@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import {
-  Star,
   MapPin,
   Calendar,
   ChevronRight,
@@ -39,21 +38,7 @@ export default function BookingCard({ bike }: { bike: Vehicle }) {
             </div>
           </div>
           <div className="text-right">
-            {bike.rating ? (
-              <>
-                <div className="flex items-center gap-1 text-tertiary mb-1">
-                  <Star size={16} fill="currentColor" />
-                  <span className="text-sm font-bold">
-                    {bike.rating.toFixed(1)}
-                  </span>
-                </div>
-                <p className="text-xs text-secondary">
-                  {bike.reviewCount || 0} reviews
-                </p>
-              </>
-            ) : (
-              <p className="text-xs text-secondary">No ratings yet</p>
-            )}
+            <p className="text-xs text-secondary">Verified fleet</p>
           </div>
         </div>
 
@@ -66,9 +51,7 @@ export default function BookingCard({ bike }: { bike: Vehicle }) {
               <p className="text-[10px] font-bold text-secondary uppercase tracking-wider">
                 Pickup Location
               </p>
-              <p className="text-sm font-bold text-on-surface">
-                {bike.location || "Da Nang City"}
-              </p>
+              <p className="text-sm font-bold text-on-surface">Da Nang City</p>
             </div>
           </div>
           <div className="p-4 rounded-2xl bg-surface-container/50 border border-outline-variant/10 flex items-center gap-4">

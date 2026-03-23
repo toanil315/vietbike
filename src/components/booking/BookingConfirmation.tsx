@@ -12,15 +12,12 @@ import {
   Share2,
   Bike,
   ShieldCheck,
-  AlertCircle,
-  Loader2,
   MessageCircle,
   Copy,
   PhoneCall,
 } from "lucide-react";
 import { useBookingStore } from "@/store/bookingStore";
 import { motion } from "motion/react";
-import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { VEHICLES } from "@/data/mockData";
 
@@ -86,7 +83,7 @@ Date: ${new Date().toLocaleDateString()}
 
 VEHICLE DETAILS
 ${displayVehicle?.name || "N/A"}
-${displayVehicle?.brand} • ${displayVehicle?.engineSize || "N/A"}
+${displayVehicle?.brand} • ${displayVehicle?.model || "N/A"}
 
 CUSTOMER INFO
 Name: ${customerInfo.name || "N/A"}
@@ -214,7 +211,10 @@ Contact: support@vietbike.com | +84 1234 567 890
                   <div className="flex gap-4">
                     <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0 bg-surface-container/20">
                       <img
-                        src={displayVehicle.image}
+                        src={
+                          displayVehicle.images?.[0]?.url ||
+                          "https://picsum.photos/seed/bike-confirm/200/200"
+                        }
                         alt={displayVehicle.name}
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
@@ -227,7 +227,7 @@ Contact: support@vietbike.com | +84 1234 567 890
                         {displayVehicle.name}
                       </p>
                       <p className="text-sm text-secondary font-medium uppercase tracking-wide mt-1">
-                        {displayVehicle.brand} • {displayVehicle.engineSize}
+                        {displayVehicle.brand} • {displayVehicle.model}
                       </p>
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-widest">
                         <Bike size={12} />

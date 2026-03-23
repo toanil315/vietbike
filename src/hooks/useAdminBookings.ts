@@ -16,7 +16,7 @@ import { handleApiError, AppError } from "@/lib/error-handler";
  */
 export function useAdminBookings(
   page: number = 1,
-  limit: number = 20,
+  pageSize: number = 20,
   filters?: {
     status?: string;
     startDate?: string;
@@ -41,19 +41,17 @@ export function useAdminBookings(
 
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: limit.toString(),
+          pageSize: pageSize.toString(),
           ...(filters?.status && { status: filters.status }),
-          ...(filters?.startDate && { startDate: filters.startDate }),
-          ...(filters?.endDate && { endDate: filters.endDate }),
         });
 
         const endpoint = `${adminBookingEndpoints.list()}?${params.toString()}`;
         const response = await apiClient.get<{
-          data: Booking[];
+          bookings: Booking[];
           pagination: typeof pagination;
         }>(endpoint);
 
-        setData(response.data || []);
+        setData(response.bookings || []);
         setPagination(response.pagination);
       } catch (err) {
         const appError = handleApiError(err);
@@ -64,7 +62,7 @@ export function useAdminBookings(
     };
 
     fetchBookings();
-  }, [page, limit, filters]);
+  }, [page, pageSize, filters]);
 
   return {
     data,
@@ -91,7 +89,7 @@ export function useAdminUpdateBookingStatus() {
         setError(null);
 
         const endpoint = adminBookingEndpoints.updateStatus(bookingId);
-        const response = await apiClient.put<Booking>(endpoint, { status });
+        const response = await apiClient.patch<Booking>(endpoint, { status });
 
         return response;
       } catch (err) {
@@ -124,14 +122,12 @@ export function useAdminRefundBooking() {
       setIsLoading(true);
       setError(null);
 
-      const endpoint = adminBookingEndpoints.refund(bookingId);
-      const response = await apiClient.post<{
-        bookingId: string;
-        refundAmount: number;
-        status: string;
-      }>(endpoint, { reason });
-
-      return response;
+      throw {
+        code: "NOT_IMPLEMENTED",
+        message: "Refund endpoint is not implemented in current backend scope.",
+        statusCode: 501,
+        details: { bookingId, reason },
+      };
     } catch (err) {
       const appError = handleApiError(err);
       setError(appError);

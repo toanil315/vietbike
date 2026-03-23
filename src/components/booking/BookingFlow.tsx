@@ -52,12 +52,6 @@ export default function BookingFlow() {
     setIsClient(true);
   }, []);
 
-  if (!isClient) return null;
-
-  if (!vehicle) {
-    return <BookingEmptyState />;
-  }
-
   /**
    * Handle previous step navigation
    */
@@ -76,6 +70,10 @@ export default function BookingFlow() {
     if (step < 3) {
       setStep(step + 1);
     } else {
+      if (!vehicle) {
+        return;
+      }
+
       // Submit booking
       await handleBookingSubmit({
         vehicle,
@@ -101,6 +99,12 @@ export default function BookingFlow() {
     paymentMethod,
     handleBookingSubmit,
   ]);
+
+  if (!isClient) return null;
+
+  if (!vehicle) {
+    return <BookingEmptyState />;
+  }
 
   const total = calculateBookingTotal(
     vehicle,

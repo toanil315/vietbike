@@ -160,7 +160,11 @@ export function useBookingByReference(reference: string) {
 /**
  * Hook for fetching customer's bookings (requires authentication)
  */
-export function useCustomerBookings(page: number = 1, limit: number = 10) {
+export function useCustomerBookings(
+  customerId: string,
+  page: number = 1,
+  pageSize: number = 10,
+) {
   const [data, setData] = useState<Booking[]>([]);
   const [pagination, setPagination] = useState({
     total: 0,
@@ -179,16 +183,16 @@ export function useCustomerBookings(page: number = 1, limit: number = 10) {
 
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: limit.toString(),
+          pageSize: pageSize.toString(),
         });
 
-        const endpoint = `${bookingEndpoints.myBookings()}?${params.toString()}`;
+        const endpoint = `${bookingEndpoints.myBookings(customerId)}?${params.toString()}`;
         const response = await apiClient.get<{
-          data: Booking[];
+          bookings: Booking[];
           pagination: typeof pagination;
         }>(endpoint);
 
-        setData(response.data);
+        setData(response.bookings || []);
         setPagination(response.pagination);
       } catch (err) {
         const appError = handleApiError(err);
@@ -199,7 +203,7 @@ export function useCustomerBookings(page: number = 1, limit: number = 10) {
     };
 
     fetchBookings();
-  }, [page, limit]);
+  }, [customerId, page, pageSize]);
 
   return {
     data,

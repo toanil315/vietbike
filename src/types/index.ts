@@ -8,20 +8,32 @@ export type VehicleStatus =
   | "rented"
   | "maintenance"
   | "unavailable";
-export type VehicleTransmission =
-  | "manual"
-  | "automatic"
-  | "semi-automatic"
-  | "electric";
-export type VehicleCategory =
-  | "scooter"
-  | "sport"
-  | "touring"
-  | "off-road"
-  | "classic";
+export type VehicleTransmission = "manual" | "automatic";
+export type VehicleCategory = "economy" | "comfort" | "premium";
+export type VehicleType = "motorcycle" | "scooter" | "electric";
 
-// Backward compatibility alias
-export type VehicleType = VehicleTransmission;
+export interface ApiSuccess<T> {
+  success: true;
+  data: T | null;
+  message?: string;
+}
+
+export interface ApiFailure {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, unknown>;
+  };
+  timestamp: string;
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
 
 export interface VehicleImage {
   id: string;
@@ -31,6 +43,7 @@ export interface VehicleImage {
 }
 
 export interface VehicleFeature {
+  id?: string;
   featureName: string;
   featureValue: string;
 }
@@ -42,45 +55,19 @@ export interface Vehicle {
   brand: string;
   model: string;
   year: number;
-  pricePerDay: number;
-  description: string;
-  status: VehicleStatus;
-
-  // Transmission and fuel info
-  transmission: VehicleTransmission;
-  fuelType: string;
-
-  // Seat and license info
-  availableSeats: number;
+  type: VehicleType;
+  category: VehicleCategory;
   licensePlate: string;
-
-  // Media
+  pricePerDay: number;
+  description: string | null;
+  availableSeats: number;
+  fuelType: string;
+  transmission: VehicleTransmission;
+  status: VehicleStatus;
   images: VehicleImage[];
-
-  // Features and specs
   features: VehicleFeature[];
-
-  // Timestamps
   createdAt: string;
   updatedAt: string;
-
-  // Optional fields for UI
-  image?: string; // Primary image (first from images array)
-  type?: VehicleTransmission; // Alias for transmission
-  category?: VehicleCategory;
-  engineSize?: string;
-  specs?: {
-    fuelCapacity?: string;
-    weight?: string;
-    seatHeight?: string;
-    topSpeed?: string;
-  };
-  rating?: number;
-  reviewCount?: number;
-  location?: string;
-  weeklyRate?: number;
-  monthlyRate?: number;
-  relatedVehicles?: Vehicle[];
 }
 
 export type BookingStatus =
@@ -92,26 +79,28 @@ export type BookingStatus =
 
 export interface BookingAddon {
   id: string;
-  name: string;
-  price: number;
-  description: string;
+  addonName: string;
+  quantity: number;
+  pricePerUnit: number;
 }
 
 export interface Booking {
   id: string;
-  referenceNumber: string;
+  reference: string;
   vehicleId: string;
   customerId: string;
-  startDate: string;
-  endDate: string;
-  pickupLocation: string;
-  dropoffLocation: string;
+  pickupLocationId: string;
+  dropoffLocationId: string;
+  pickupDate: string;
+  dropoffDate: string;
   status: BookingStatus;
-  totalPrice: number;
-  addons: string[];
+  totalAmount: number;
+  addons: BookingAddon[];
   paymentMethod: string;
-  paymentStatus: "pending" | "paid" | "refunded";
+  voucherCode?: string;
+  voucherDiscount: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface Customer {

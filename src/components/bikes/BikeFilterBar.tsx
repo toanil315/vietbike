@@ -1,11 +1,9 @@
 "use client";
 
-// Bike filter bar component with dynamic filtering and debouncing
+// Bike filter bar component with URL-synced filter controls
 
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useCallback, useRef } from "react";
-import { useVehicles } from "@/hooks/useVehicles";
 
 interface BikeFilterBarProps {
   city: string;
@@ -36,63 +34,9 @@ export default function BikeFilterBar({
   priceRange,
   setPriceRange,
 }: BikeFilterBarProps) {
-  // Extract unique brands and categories dynamically
-  const [brands, setBrands] = useState<string[]>(["Any Brand"]);
-  const [categories, setCategories] = useState<string[]>(["All Categories"]);
-
-  // Debounce timer refs
-  const priceDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const typeDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const brandDebounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Debounced setters with 300ms delay
-  const debouncedSetPriceRange = useCallback(
-    (value: number) => {
-      if (priceDebounceRef.current) clearTimeout(priceDebounceRef.current);
-      priceDebounceRef.current = setTimeout(() => {
-        setPriceRange(value);
-      }, 300);
-    },
-    [setPriceRange],
-  );
-
-  const debouncedSetType = useCallback(
-    (value: string) => {
-      if (typeDebounceRef.current) clearTimeout(typeDebounceRef.current);
-      typeDebounceRef.current = setTimeout(() => {
-        setType(value);
-      }, 300);
-    },
-    [setType],
-  );
-
-  const debouncedSetBrand = useCallback(
-    (value: string) => {
-      if (brandDebounceRef.current) clearTimeout(brandDebounceRef.current);
-      brandDebounceRef.current = setTimeout(() => {
-        setBrand(value);
-      }, 300);
-    },
-    [setBrand],
-  );
-
-  // Cleanup debounce timers on unmount
-  useEffect(() => {
-    return () => {
-      if (priceDebounceRef.current) clearTimeout(priceDebounceRef.current);
-      if (typeDebounceRef.current) clearTimeout(typeDebounceRef.current);
-      if (brandDebounceRef.current) clearTimeout(brandDebounceRef.current);
-    };
-  }, []);
-
   const cities = ["All Cities", "Ho Chi Minh", "Hanoi", "Da Nang"];
-  const types = [
-    "Select Types",
-    "Automatic",
-    "Manual",
-    "Electric",
-    "Semi-automatic",
-  ];
+  const types = ["Select Types", "Motorcycle", "Scooter", "Electric"];
+  const brands = ["Any Brand", "Honda", "Yamaha", "Suzuki", "Piaggio"];
 
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-outline-variant/10 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-end gap-6 md:gap-8">
@@ -128,10 +72,10 @@ export default function BikeFilterBar({
         <div className="relative">
           <select
             value={type}
-            onChange={(e) => debouncedSetType(e.target.value)}
+            onChange={(e) => setType(e.target.value)}
             className="w-full appearance-none bg-surface-container/30 border border-outline-variant/20 rounded-2xl py-4 px-5 pr-12 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all hover:bg-surface-container/50"
           >
-            {categories.map((c) => (
+            {types.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -161,7 +105,7 @@ export default function BikeFilterBar({
             max="10"
             step="1"
             value={priceRange}
-            onChange={(e) => debouncedSetPriceRange(parseInt(e.target.value))}
+            onChange={(e) => setPriceRange(parseInt(e.target.value, 10))}
             className="w-full h-2 bg-surface-container rounded-full appearance-none cursor-pointer accent-primary"
           />
         </div>
@@ -175,7 +119,7 @@ export default function BikeFilterBar({
         <div className="relative">
           <select
             value={brand}
-            onChange={(e) => debouncedSetBrand(e.target.value)}
+            onChange={(e) => setBrand(e.target.value)}
             className="w-full appearance-none bg-surface-container/30 border border-outline-variant/20 rounded-2xl py-4 px-5 pr-12 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all hover:bg-surface-container/50"
           >
             {brands.map((b) => (

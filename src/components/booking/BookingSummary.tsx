@@ -54,6 +54,7 @@ export default function BookingSummary({
 
   const hasDateRange = startDate && endDate;
   const hasMissingInfo = !hasDateRange && selectedAddons.length === 0;
+  const primaryImageUrl = vehicle.images?.[0]?.url;
 
   return (
     <aside className="sticky top-8 space-y-6">
@@ -69,9 +70,9 @@ export default function BookingSummary({
         {/* Vehicle Card */}
         <div className="flex gap-4 pb-8 border-b border-outline-variant/10">
           <div className="w-24 h-24 rounded-2xl overflow-hidden border border-outline-variant/10 shrink-0 bg-surface-container/20">
-            {vehicle.image ? (
+            {primaryImageUrl ? (
               <img
-                src={vehicle.image}
+                src={primaryImageUrl}
                 alt={vehicle.name}
                 className="w-full h-full object-cover"
                 width={200}
@@ -87,7 +88,7 @@ export default function BookingSummary({
           <div className="flex-1">
             <p className="font-bold text-lg">{vehicle.name}</p>
             <p className="text-xs text-secondary font-medium uppercase tracking-wider mt-1">
-              {vehicle.brand} • {vehicle.engineSize}
+              {vehicle.brand} • {vehicle.model}
             </p>
             {vehicle.type === "electric" && (
               <div className="flex items-center gap-1 text-emerald-600 mt-2">
@@ -97,12 +98,7 @@ export default function BookingSummary({
             )}
             <div className="flex items-center gap-1 text-tertiary mt-2">
               <Star size={14} fill="currentColor" />
-              <span className="text-xs font-bold">
-                {vehicle?.rating?.toFixed(1)}
-              </span>
-              <span className="text-xs text-secondary">
-                ({vehicle?.reviewCount})
-              </span>
+              <span className="text-xs text-secondary">Verified fleet</span>
             </div>
           </div>
         </div>

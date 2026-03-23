@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, MapPin, ArrowRight, Zap } from "lucide-react";
+import { MapPin, ArrowRight, Zap } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { motion } from "motion/react";
 import { Vehicle } from "@/types";
@@ -51,6 +51,7 @@ export default function BikeCard({
   const primaryImage = bike.images?.[0];
   const topFeatures = bike.features?.slice(0, 2) || [];
   const hasElectric = bike.type === "electric";
+  const vehicleLabel = [bike.brand, bike.model].filter(Boolean).join(" • ");
 
   return (
     <motion.div
@@ -107,28 +108,22 @@ export default function BikeCard({
 
         {/* Content Section */}
         <div className="p-6 flex-1 flex flex-col">
-          {/* Header: Name & Rating */}
-          <div className="flex justify-between items-start mb-2 gap-2">
+          {/* Header */}
+          <div className="mb-2">
             <h3 className="text-lg font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2 flex-1">
               {bike.name}
             </h3>
-            <div className="flex items-center gap-1 text-tertiary shrink-0">
-              <Star size={14} fill="currentColor" />
-              <span className="text-xs font-bold">
-                {bike.rating?.toFixed(1)}
-              </span>
-            </div>
           </div>
 
           {/* Location & Brand */}
           <div className="flex items-center gap-1.5 text-secondary text-xs mb-3">
             <MapPin size={12} className="text-primary shrink-0" />
-            <span className="truncate">{bike.location || "Vietnam"}</span>
+            <span className="truncate">Vietnam</span>
           </div>
 
-          {/* Brand & Engine Size */}
+          {/* Brand & Model */}
           <p className="text-[11px] text-secondary font-medium uppercase tracking-widest mb-3">
-            {bike.brand} • {bike.engineSize}
+            {vehicleLabel}
           </p>
 
           {/* Features Chips (Top 2) */}

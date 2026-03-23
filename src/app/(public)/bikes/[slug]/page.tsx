@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, Star, AlertCircle } from "lucide-react";
+import { ChevronRight, AlertCircle } from "lucide-react";
 
 // Bike detail page with ISR and SEO
 import BikeGallery from "@/components/bikes/BikeGallery";
-import BikeSpecs from "@/components/bikes/BikeSpecs";
 import BikeFeatures from "@/components/bikes/BikeFeatures";
 import BookingCard from "@/components/bikes/BookingCard";
 import { vehicleEndpoints } from "@/lib/api-endpoints";
@@ -86,21 +85,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // Get primary image from images array
-  const primaryImage = bike.images?.[0] || "";
+  const description =
+    bike.description ||
+    `Rent ${bike.name} in Vietnam. ${bike.pricePerDay}/day.`;
+  const primaryImageUrl = bike.images?.[0]?.url;
 
   return {
     title: `Rent ${bike.name} - ${bike.brand} ${bike.year} | VietBike`,
-    description:
-      bike.description ||
-      `Rent ${bike.name} in Vietnam. ${bike.pricePerDay}/day.`,
+    description,
     openGraph: {
       title: `Rent ${bike.name} | VietBike Bike Rental`,
-      description: bike.description,
-      images: primaryImage
+      description,
+      images: primaryImageUrl
         ? [
             {
-              url: primaryImage.url,
+              url: primaryImageUrl,
               width: 1200,
               height: 800,
               alt: bike.name,
@@ -113,8 +112,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: `Rent ${bike.name} | VietBike`,
-      description: bike.description,
-      images: primaryImage ? [primaryImage] : [],
+      description,
+      images: primaryImageUrl ? [primaryImageUrl] : undefined,
     },
     keywords: [
       bike.name,
@@ -178,18 +177,6 @@ export default async function BikeDetailPage({ params }: Props) {
         url: "https://vietbike.example.com",
       },
     },
-    // Only include rating/review if available
-    ...(bike.rating
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: bike.rating.toString(),
-            bestRating: "5",
-            worstRating: "1",
-            ratingCount: (bike.reviewCount || 0).toString(),
-          },
-        }
-      : {}),
   };
 
   return (
@@ -248,36 +235,20 @@ export default async function BikeDetailPage({ params }: Props) {
                   <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                     {bike.fuelType || "N/A"}
                   </span>
-                  {bike.rating != null && bike.rating > 0 && (
-                    <div className="flex items-center gap-1 text-tertiary">
-                      <Star size={14} fill="currentColor" />
-                      <span className="text-xs font-bold">
-                        {bike.rating.toFixed(1)}
-                      </span>
-                      <span className="text-xs text-secondary ml-1">
-                        ({bike.reviewCount || 0} reviews)
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-on-surface mb-2">
                   {bike.name}
                 </h1>
 
                 <p className="text-lg text-secondary font-medium mb-4">
-                  {bike.brand} • {bike.year} • {bike.transmission || "N/A"} •{" "}
-                  {bike.fuelType || "N/A"}
+                  {bike.brand} • {bike.model} • {bike.year} •{" "}
+                  {bike.transmission || "N/A"} • {bike.fuelType || "N/A"}
                 </p>
 
                 <p className="text-lg text-secondary leading-relaxed">
                   {bike.description}
                 </p>
               </section>
-
-              {/* Specifications */}
-              {bike.specs && bike.engineSize && (
-                <BikeSpecs specs={bike.specs} engineSize={bike.engineSize} />
-              )}
 
               {/* Features List */}
               {bike.features && bike.features.length > 0 && (
@@ -294,44 +265,14 @@ export default async function BikeDetailPage({ params }: Props) {
           </aside>
         </div>
 
-        {/* Related Bikes Section */}
         <div className="mt-20 pt-12 border-t border-outline-variant/10">
-          <h2 className="text-3xl font-bold text-on-surface mb-8">
-            More Bikes Available
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {bike.relatedVehicles && bike.relatedVehicles.length > 0
-              ? bike.relatedVehicles.slice(0, 3).map((relatedBike: any) => (
-                  <Link
-                    key={relatedBike.id}
-                    href={`/bikes/${relatedBike.slug}`}
-                    className="group bg-white rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/30 transition-all"
-                  >
-                    <div className="relative h-40 overflow-hidden bg-surface-container/20">
-                      {relatedBike.images && relatedBike.images[0] && (
-                        <img
-                          src={relatedBike.images[0]}
-                          alt={relatedBike.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          referrerPolicy="no-referrer"
-                        />
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">
-                        {relatedBike.name}
-                      </h3>
-                      <p className="text-xs text-secondary mt-1">
-                        {relatedBike.brand}
-                      </p>
-                      <p className="text-lg font-bold text-primary mt-2">
-                        ${relatedBike.pricePerDay}/day
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              : null}
-          </div>
+          <Link
+            href="/bikes"
+            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+          >
+            Browse more bikes
+            <ChevronRight size={14} />
+          </Link>
         </div>
       </div>
     </div>

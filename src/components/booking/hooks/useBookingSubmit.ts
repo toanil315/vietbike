@@ -7,9 +7,10 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCreateBooking } from "@/hooks/useBooking";
+import { createBookingAction } from "@/app/(public)/booking/actions";
 import { prepareBookingData } from "../handlers/bookingHandlers";
 import { Vehicle } from "@/types";
+import { useBookingStore } from "@/store/bookingStore";
 
 interface UseBookingSubmitParams {
   vehicle: Vehicle;
@@ -27,7 +28,7 @@ interface UseBookingSubmitParams {
  */
 export function useBookingSubmit() {
   const router = useRouter();
-  const { mutate: createBooking } = useCreateBooking();
+  const { setBookingReference, resetBooking } = useBookingStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,20 +49,21 @@ export function useBookingSubmit() {
           params.paymentMethod,
         );
 
-        // Convert ISO strings back to Date objects for the API
-        const apiData = {
-          ...bookingData,
-          startDate: new Date(bookingData.startDate),
-          endDate: new Date(bookingData.endDate),
-        };
+        const response = await createBookingAction(bookingData);
 
-        const response = await createBooking(apiData);
-
-        if (response?.reference) {
+        if (
+          response.success &&
+          response.data?.reference &&
+          response.data.bookingId
+        ) {
+          resetBooking();
+          setBookingReference(response.data.reference, response.data.bookingId);
           setIsSubmitting(false);
-          router.push(`/booking/confirmation?reference=${response.reference}`);
+          router.push(
+            `/booking/confirmation?reference=${response.data.reference}`,
+          );
         } else {
-          throw new Error("No booking reference returned");
+          throw new Error(response.error || "No booking reference returned");
         }
       } catch (err) {
         const errorMessage =
@@ -71,7 +73,7 @@ export function useBookingSubmit() {
         console.error("Booking submission error:", err);
       }
     },
-    [createBooking, router],
+    [router, setBookingReference, resetBooking],
   );
 
   return {

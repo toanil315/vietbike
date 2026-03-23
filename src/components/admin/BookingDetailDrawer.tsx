@@ -9,8 +9,8 @@ import {
   CheckCircle2,
   User,
 } from "lucide-react";
-import { Customer, Vehicle, Booking, BookingStatus } from "@/types";
-import { ADDONS } from "@/data/mockData";
+import { Customer, Vehicle, BookingStatus } from "@/types";
+import { ADDONS, MockBooking } from "@/data/mockData";
 import { formatPrice, formatDate, cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -24,7 +24,7 @@ const statusColors: Record<BookingStatus, string> = {
 };
 
 interface BookingDetailDrawerProps {
-  booking: Booking;
+  booking: MockBooking;
   customer: Customer;
   vehicle: Vehicle;
   onClose: () => void;
@@ -37,7 +37,7 @@ export default function BookingDetailDrawer({
   onClose,
 }: BookingDetailDrawerProps) {
   return (
-    <div className="absolute top-0 right-0 bottom-0 w-[400px] bg-white border-l border-outline-variant/15 shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
+    <div className="absolute top-0 right-0 bottom-0 w-100 bg-white border-l border-outline-variant/15 shadow-2xl z-20 flex flex-col animate-in slide-in-from-right duration-300">
       <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">
         <div>
           <h2 className="font-bold text-lg text-on-surface">Chi tiết đặt xe</h2>
@@ -133,7 +133,10 @@ export default function BookingDetailDrawer({
           <div className="bg-surface-container/20 border border-outline-variant/10 rounded-2xl p-3 flex items-center gap-4">
             <div className="w-20 h-14 rounded-xl overflow-hidden shrink-0">
               <img
-                src={vehicle.image}
+                src={
+                  vehicle.images?.[0]?.url ||
+                  "https://picsum.photos/seed/bike/400/300"
+                }
                 alt={vehicle.name}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -184,7 +187,7 @@ export default function BookingDetailDrawer({
           </p>
           <div className="space-y-3">
             {booking.addons.map((addonId) => {
-              const addon = ADDONS.find((a) => a.id === addonId);
+              const addon = ADDONS.find((item) => item.id === addonId);
               return (
                 <div
                   key={addonId}

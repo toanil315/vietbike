@@ -3,23 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Vehicle, BookingAddon } from "@/types";
+import { Vehicle } from "@/types";
 
 export interface BookingFormData {
   vehicleId: string;
-  startDate: string;
-  endDate: string;
+  pickupDate: string;
+  dropoffDate: string;
   pickupLocationId: string;
   dropoffLocationId: string;
-  customerInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    nationality: string;
-    licenseNumber: string;
-  };
-  addons: string[];
-  paymentMethod: "cash" | "bank_transfer";
+  addons: Array<{ addonId: string; quantity: number }>;
+  paymentMethod: "cash" | "card" | "bank_transfer" | "wallet";
 }
 
 /**
@@ -62,7 +55,7 @@ export function calculateBookingTotal(
  */
 export function prepareBookingData(
   vehicle: Vehicle,
-  customerInfo: Record<string, string>,
+  _customerInfo: Record<string, string>,
   startDate: string,
   endDate: string,
   pickupLocation: string,
@@ -72,22 +65,22 @@ export function prepareBookingData(
 ): BookingFormData {
   return {
     vehicleId: vehicle?.id || "",
-    startDate: startDate
+    pickupDate: startDate
       ? new Date(startDate).toISOString()
       : new Date().toISOString(),
-    endDate: endDate
+    dropoffDate: endDate
       ? new Date(endDate).toISOString()
       : new Date().toISOString(),
     pickupLocationId: pickupLocation || "",
     dropoffLocationId: dropoffLocation || "",
-    customerInfo: {
-      name: customerInfo?.name || "",
-      email: customerInfo?.email || "",
-      phone: customerInfo?.phone || "",
-      nationality: customerInfo?.nationality || "",
-      licenseNumber: customerInfo?.licenseNumber || "",
-    },
-    addons: selectedAddons || [],
-    paymentMethod: (paymentMethod || "cash") as "cash" | "bank_transfer",
+    addons: (selectedAddons || []).map((addonId) => ({
+      addonId,
+      quantity: 1,
+    })),
+    paymentMethod: (paymentMethod || "cash") as
+      | "cash"
+      | "card"
+      | "bank_transfer"
+      | "wallet",
   };
 }

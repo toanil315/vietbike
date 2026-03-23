@@ -32,8 +32,8 @@ export default function VehicleForm() {
     brand: "",
     model: "",
     year: new Date().getFullYear(),
-    type: "automatic" as VehicleType,
-    category: "scooter" as VehicleCategory,
+    type: "scooter" as VehicleType,
+    category: "economy" as VehicleCategory,
     engineSize: "",
     pricePerDay: 0,
     weeklyRate: 0,
@@ -45,19 +45,8 @@ export default function VehicleForm() {
     images: [] as string[],
   });
 
-  const categories: VehicleCategory[] = [
-    "scooter",
-    "sport",
-    "touring",
-    "off-road",
-    "classic",
-  ];
-  const types: VehicleType[] = [
-    "automatic",
-    "manual",
-    "semi-automatic",
-    "electric",
-  ];
+  const categories: VehicleCategory[] = ["economy", "comfort", "premium"];
+  const types: VehicleType[] = ["scooter", "motorcycle", "electric"];
   const commonFeatures = [
     "Phanh ABS",
     "Giá đỡ điện thoại",
@@ -143,7 +132,7 @@ export default function VehicleForm() {
       <form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Basic Information */}
-          <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-8">
+          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
             <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
               <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <Info size={20} />
@@ -235,11 +224,9 @@ export default function VehicleForm() {
                       })
                     }
                   >
-                    <option value="scooter">Xe tay ga</option>
-                    <option value="sport">Xe thể thao</option>
-                    <option value="touring">Xe đường trường</option>
-                    <option value="off-road">Xe địa hình</option>
-                    <option value="classic">Xe cổ điển</option>
+                    <option value="economy">Economy</option>
+                    <option value="comfort">Comfort</option>
+                    <option value="premium">Premium</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -256,10 +243,9 @@ export default function VehicleForm() {
                       })
                     }
                   >
-                    <option value="automatic">Xe ga</option>
-                    <option value="manual">Xe côn tay</option>
-                    <option value="semi-automatic">Xe số</option>
-                    <option value="electric">Xe điện</option>
+                    <option value="scooter">Scooter</option>
+                    <option value="motorcycle">Motorcycle</option>
+                    <option value="electric">Electric</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -286,7 +272,7 @@ export default function VehicleForm() {
           </section>
 
           {/* Vehicle Gallery */}
-          <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-8">
+          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
             <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
               <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <ImageIcon size={20} />
@@ -342,7 +328,7 @@ export default function VehicleForm() {
 
           {/* Key Features & Description */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-6">
+            <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-outline-variant/10">
                 <Zap size={18} className="text-primary" />
                 <h2 className="font-bold text-on-surface">Tiện ích đi kèm</h2>
@@ -370,7 +356,7 @@ export default function VehicleForm() {
               </div>
             </section>
 
-            <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-6">
+            <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-outline-variant/10">
                 <FileText size={18} className="text-primary" />
                 <h2 className="font-bold text-on-surface">Mô tả chi tiết</h2>
@@ -394,7 +380,7 @@ export default function VehicleForm() {
 
         <div className="space-y-8">
           {/* Rental Pricing */}
-          <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-8">
+          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
             <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
               <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <DollarSign size={20} />
@@ -473,7 +459,7 @@ export default function VehicleForm() {
           </section>
 
           {/* Location & Status */}
-          <section className="bg-white rounded-[2rem] p-8 border border-outline-variant/10 shadow-sm space-y-8">
+          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
             <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
               <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <MapPin size={20} />

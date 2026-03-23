@@ -18,17 +18,30 @@ import {
 import { useBookingStore } from "@/store/bookingStore";
 import { motion } from "motion/react";
 import { formatPrice } from "@/lib/utils";
-import { VEHICLES } from "@/data/mockData";
+import apiClient from "@/lib/api";
+import { bookingEndpoints, vehicleEndpoints } from "@/lib/api-endpoints";
+import { Booking, Vehicle } from "@/types";
 
 export default function BookingConfirmation() {
-  const { vehicle, customerInfo, resetBooking, startDate, endDate } =
-    useBookingStore();
+  const {
+    vehicle,
+    customerInfo,
+    resetBooking,
+    startDate,
+    endDate,
+    bookingReference,
+  } = useBookingStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [bookingDetail, setBookingDetail] = useState<Booking | null>(null);
+  const [fetchedVehicle, setFetchedVehicle] = useState<Vehicle | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
 
   const reference = searchParams.get("reference");
+  const currentReference = reference || bookingReference;
 
   useEffect(() => {
     setIsClient(true);
@@ -41,23 +54,70 @@ export default function BookingConfirmation() {
     }
   }, [vehicle, reference, router]);
 
+  useEffect(() => {
+    const loadBooking = async () => {
+      if (!currentReference) {
+        return;
+      }
+
+      try {
+        setIsLoadingDetails(true);
+        setDetailsError(null);
+
+        const booking = await apiClient.get<Booking>(
+          bookingEndpoints.getByReference(currentReference),
+        );
+        setBookingDetail(booking);
+
+        if (booking?.vehicleId) {
+          const vehicleDetail = await apiClient.get<Vehicle>(
+            vehicleEndpoints.byId(booking.vehicleId),
+          );
+          setFetchedVehicle(vehicleDetail);
+        }
+      } catch (err) {
+        setDetailsError(
+          err instanceof Error ? err.message : "Unable to load booking details",
+        );
+      } finally {
+        setIsLoadingDetails(false);
+      }
+    };
+
+    if (isClient) {
+      void loadBooking();
+    }
+  }, [currentReference, isClient]);
+
   if (!isClient) return null;
 
   // Determine what booking data to display
-  const displayVehicle = vehicle || (VEHICLES.length > 0 ? VEHICLES[0] : null);
+  const displayVehicle = fetchedVehicle || vehicle;
+  const displayCustomer = {
+    name: bookingDetail?.customerInfo?.fullName || customerInfo.name,
+    email: bookingDetail?.customerInfo?.email || customerInfo.email,
+    phone: bookingDetail?.customerInfo?.phone || customerInfo.phone,
+  };
+  const displayStartDate = bookingDetail?.pickupDate || startDate;
+  const displayEndDate = bookingDetail?.dropoffDate || endDate;
+
   const numberOfDays =
-    startDate && endDate
+    displayStartDate && displayEndDate
       ? Math.ceil(
-          (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+          (new Date(displayEndDate).getTime() -
+            new Date(displayStartDate).getTime()) /
             (1000 * 60 * 60 * 24),
         ) || 1
       : 3;
 
   const bookingId =
-    reference || `VELO-${Date.now().toString(36).toUpperCase().slice(-8)}`;
-  const totalPrice = displayVehicle
-    ? displayVehicle.pricePerDay * numberOfDays
-    : 0;
+    bookingDetail?.reference ||
+    currentReference ||
+    `VELO-${Date.now().toString(36).toUpperCase().slice(-8)}`;
+
+  const totalPrice =
+    bookingDetail?.totalAmount ||
+    (displayVehicle ? displayVehicle.pricePerDay * numberOfDays : 0);
 
   const handleCopyReference = () => {
     navigator.clipboard.writeText(bookingId);
@@ -78,21 +138,19 @@ ${displayVehicle?.name || "N/A"}
 ${displayVehicle?.brand} • ${displayVehicle?.model || "N/A"}
 
 CUSTOMER INFO
-Name: ${customerInfo.name || "N/A"}
-Email: ${customerInfo.email || "N/A"}
-Phone: ${customerInfo.phone || "N/A"}
+Name: ${displayCustomer.name || "N/A"}
+Email: ${displayCustomer.email || "N/A"}
+Phone: ${displayCustomer.phone || "N/A"}
 
 RENTAL PERIOD
-Check-in: ${startDate || "N/A"}
-Check-out: ${endDate || "N/A"}
+Check-in: ${displayStartDate || "N/A"}
+Check-out: ${displayEndDate || "N/A"}
 Duration: ${numberOfDays} days
 
 PRICING
 Daily Rate: ${formatPrice(displayVehicle?.pricePerDay || 0)}
 Number of Days: ${numberOfDays}
-Subtotal: ${formatPrice(totalPrice)}
-Taxes & Fees: ${formatPrice(totalPrice * 0.1)}
-Total: ${formatPrice(totalPrice * 1.1)}
+Total: ${formatPrice(totalPrice)}
 
 Thank you for booking with VietBike!
 Contact: support@vietbike.com | +84 1234 567 890
@@ -186,6 +244,18 @@ Contact: support@vietbike.com | +84 1234 567 890
         </div>
 
         <div className="p-8 md:p-12 space-y-12">
+          {isLoadingDetails && (
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+              Loading booking details...
+            </div>
+          )}
+
+          {detailsError && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              {detailsError}. Showing available local data.
+            </div>
+          )}
+
           {/* Main Info Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Left Column */}
@@ -247,12 +317,15 @@ Contact: support@vietbike.com | +84 1234 567 890
                         Check-in
                       </p>
                       <p className="text-sm font-bold text-on-surface">
-                        {startDate
-                          ? new Date(startDate).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                        {displayStartDate
+                          ? new Date(displayStartDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )
                           : "N/A"}
                       </p>
                     </div>
@@ -266,12 +339,15 @@ Contact: support@vietbike.com | +84 1234 567 890
                         Check-out
                       </p>
                       <p className="text-sm font-bold text-on-surface">
-                        {endDate
-                          ? new Date(endDate).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                        {displayEndDate
+                          ? new Date(displayEndDate).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              },
+                            )
                           : "N/A"}
                       </p>
                     </div>
@@ -296,19 +372,19 @@ Contact: support@vietbike.com | +84 1234 567 890
                   <div>
                     <p className="text-xs text-secondary mb-1">Full Name</p>
                     <p className="font-bold text-on-surface">
-                      {customerInfo.name || "Not provided"}
+                      {displayCustomer.name || "Not provided"}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-secondary mb-1">Email</p>
                     <p className="font-bold text-on-surface break-all">
-                      {customerInfo.email || "Not provided"}
+                      {displayCustomer.email || "Not provided"}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-secondary mb-1">Phone</p>
                     <p className="font-bold text-on-surface">
-                      {customerInfo.phone || "Not provided"}
+                      {displayCustomer.phone || "Not provided"}
                     </p>
                   </div>
                 </div>
@@ -329,18 +405,10 @@ Contact: support@vietbike.com | +84 1234 567 890
                   </span>
                   <span className="font-bold">{formatPrice(totalPrice)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-secondary">
-                    Taxes & Fees (10%)
-                  </span>
-                  <span className="font-bold text-secondary">
-                    {formatPrice(totalPrice * 0.1)}
-                  </span>
-                </div>
                 <div className="border-t border-amber-200/50 pt-4 flex justify-between">
                   <span className="font-bold text-lg">Total Payment</span>
                   <span className="font-bold text-2xl text-primary">
-                    {formatPrice(totalPrice * 1.1)}
+                    {formatPrice(totalPrice)}
                   </span>
                 </div>
               </div>

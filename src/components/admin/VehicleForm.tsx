@@ -1,554 +1,755 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ChevronLeft,
-  Upload,
   Plus,
-  X,
-  Info,
-  DollarSign,
-  MapPin,
-  Image as ImageIcon,
-  Zap,
-  FileText,
-  CheckCircle2,
   Save,
+  Trash2,
+  Loader2,
+  Image as ImageIcon,
+  Sparkles,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { VehicleType, VehicleCategory, Vehicle } from "@/types";
-import Image from "next/image";
+import apiClient from "@/lib/api";
+import { adminVehicleEndpoints } from "@/lib/api-endpoints";
+import { Vehicle } from "@/types";
+import {
+  addVehicleFeatureAction,
+  addVehicleImageAction,
+  createVehicleAction,
+  deleteVehicleFeatureAction,
+  deleteVehicleImageAction,
+  updateVehicleAction,
+  updateVehicleStatusAction,
+} from "@/app/admin/vehicles/actions";
+
+interface ImageInput {
+  id?: string;
+  url: string;
+  altText?: string;
+}
+
+interface FeatureInput {
+  id?: string;
+  featureName: string;
+  featureValue: string;
+}
+
+const vehicleTypes = ["motorcycle", "scooter", "electric"] as const;
+const categories = ["economy", "comfort", "premium"] as const;
+const transmissions = ["manual", "automatic"] as const;
+const statuses = ["available", "rented", "maintenance", "unavailable"] as const;
+
+function toSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
 export default function VehicleForm() {
   const router = useRouter();
   const params = useParams();
-  const id = params?.id as string | undefined;
-  const isEdit = Boolean(id);
+  const vehicleId = params?.id as string | undefined;
+  const isEdit = Boolean(vehicleId);
+
+  const [isLoadingVehicle, setIsLoadingVehicle] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
+    slug: "",
     brand: "",
     model: "",
     year: new Date().getFullYear(),
-    type: "scooter" as VehicleType,
-    category: "economy" as VehicleCategory,
-    engineSize: "",
+    licensePlate: "",
     pricePerDay: 0,
-    weeklyRate: 0,
-    monthlyRate: 0,
-    location: "",
-    status: "available",
     description: "",
-    features: [] as string[],
-    images: [] as string[],
+    availableSeats: 2,
+    fuelType: "petrol",
+    transmission: "automatic" as (typeof transmissions)[number],
+    type: "scooter" as (typeof vehicleTypes)[number],
+    category: "economy" as (typeof categories)[number],
+    status: "available" as (typeof statuses)[number],
   });
 
-  const categories: VehicleCategory[] = ["economy", "comfort", "premium"];
-  const types: VehicleType[] = ["scooter", "motorcycle", "electric"];
-  const commonFeatures = [
-    "Phanh ABS",
-    "Giá đỡ điện thoại",
-    "Cổng sạc USB",
-    "Thùng đồ sau",
-    "Thùng đồ hông",
-    "Sưởi tay lái",
-    "Đèn pha LED",
-    "Khóa thông minh",
-  ];
+  const [images, setImages] = useState<ImageInput[]>([]);
+  const [features, setFeatures] = useState<FeatureInput[]>([]);
+  const [newImage, setNewImage] = useState({ url: "", altText: "" });
+  const [newFeature, setNewFeature] = useState({
+    featureName: "",
+    featureValue: "",
+  });
 
-  const handleFeatureToggle = (feature: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter((f) => f !== feature)
-        : [...prev.features, feature],
-    }));
-  };
+  useEffect(() => {
+    const loadVehicle = async () => {
+      if (!vehicleId) {
+        return;
+      }
+
+      try {
+        setIsLoadingVehicle(true);
+        setError(null);
+
+        const vehicle = await apiClient.get<Vehicle>(
+          adminVehicleEndpoints.detail(vehicleId),
+        );
+
+        setFormData({
+          name: vehicle.name,
+          slug: vehicle.slug,
+          brand: vehicle.brand,
+          model: vehicle.model,
+          year: vehicle.year,
+          licensePlate: vehicle.licensePlate,
+          pricePerDay: vehicle.pricePerDay,
+          description: vehicle.description || "",
+          availableSeats: vehicle.availableSeats,
+          fuelType: vehicle.fuelType,
+          transmission: vehicle.transmission,
+          type: vehicle.type,
+          category: vehicle.category,
+          status: vehicle.status,
+        });
+
+        setImages(
+          (vehicle.images || []).map((img) => ({
+            id: img.id,
+            url: img.url,
+            altText: img.altText || "",
+          })),
+        );
+
+        setFeatures(
+          (vehicle.features || []).map((feature) => ({
+            id: feature.id,
+            featureName: feature.featureName,
+            featureValue: feature.featureValue,
+          })),
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Cannot load vehicle");
+      } finally {
+        setIsLoadingVehicle(false);
+      }
+    };
+
+    void loadVehicle();
+  }, [vehicleId]);
+
+  useEffect(() => {
+    if (!isEdit) {
+      setFormData((prev) => ({
+        ...prev,
+        slug: toSlug(prev.name),
+      }));
+    }
+  }, [formData.name, isEdit]);
+
+  const baseUpdatePayload = useMemo(
+    () => ({
+      name: formData.name,
+      slug: formData.slug,
+      brand: formData.brand,
+      model: formData.model,
+      year: Number(formData.year),
+      licensePlate: formData.licensePlate,
+      pricePerDay: Number(formData.pricePerDay),
+      description: formData.description || undefined,
+      availableSeats: Number(formData.availableSeats),
+      fuelType: formData.fuelType,
+      transmission: formData.transmission,
+    }),
+    [formData],
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    router.push("/admin/vehicles");
+
+    try {
+      if (isEdit && vehicleId) {
+        const updated = await updateVehicleAction(vehicleId, baseUpdatePayload);
+        if (!updated.ok) {
+          throw new Error(updated.error || "Failed to update vehicle");
+        }
+
+        setSuccess("Vehicle updated successfully.");
+      } else {
+        const created = await createVehicleAction({
+          ...baseUpdatePayload,
+          type: formData.type,
+          category: formData.category,
+          images: images
+            .filter((img) => img.url.trim())
+            .map((img) => ({
+              url: img.url,
+              altText: img.altText || undefined,
+            })),
+          features: features
+            .filter(
+              (feature) =>
+                feature.featureName.trim() && feature.featureValue.trim(),
+            )
+            .map((feature) => ({
+              featureName: feature.featureName,
+              featureValue: feature.featureValue,
+            })),
+        });
+
+        if (!created.ok) {
+          throw new Error(created.error || "Failed to create vehicle");
+        }
+
+        router.push("/admin/vehicles");
+        return;
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to submit form");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  const handleStatusUpdate = async () => {
+    if (!vehicleId) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setIsUpdatingStatus(true);
+
+    const result = await updateVehicleStatusAction(vehicleId, formData.status);
+    setIsUpdatingStatus(false);
+
+    if (!result.ok) {
+      setError(result.error || "Failed to update status");
+      return;
+    }
+
+    setSuccess("Vehicle status updated.");
+  };
+
+  const handleAddImage = async () => {
+    if (!newImage.url.trim()) {
+      return;
+    }
+
+    if (!vehicleId) {
+      setImages((prev) => [
+        ...prev,
+        { url: newImage.url, altText: newImage.altText },
+      ]);
+      setNewImage({ url: "", altText: "" });
+      return;
+    }
+
+    const result = await addVehicleImageAction(vehicleId, {
+      url: newImage.url,
+      altText: newImage.altText || undefined,
+    });
+
+    if (!result.ok) {
+      setError(result.error || "Cannot add image");
+      return;
+    }
+
+    setImages((prev) => [
+      ...prev,
+      { id: result.data?.id, url: newImage.url, altText: newImage.altText },
+    ]);
+    setNewImage({ url: "", altText: "" });
+  };
+
+  const handleDeleteImage = async (image: ImageInput) => {
+    if (!vehicleId || !image.id) {
+      setImages((prev) => prev.filter((item) => item !== image));
+      return;
+    }
+
+    const result = await deleteVehicleImageAction(vehicleId, image.id);
+    if (!result.ok) {
+      setError(result.error || "Cannot delete image");
+      return;
+    }
+
+    setImages((prev) => prev.filter((item) => item.id !== image.id));
+  };
+
+  const handleAddFeature = async () => {
+    if (!newFeature.featureName.trim() || !newFeature.featureValue.trim()) {
+      return;
+    }
+
+    if (!vehicleId) {
+      setFeatures((prev) => [...prev, { ...newFeature }]);
+      setNewFeature({ featureName: "", featureValue: "" });
+      return;
+    }
+
+    const result = await addVehicleFeatureAction(vehicleId, {
+      featureName: newFeature.featureName,
+      featureValue: newFeature.featureValue,
+    });
+
+    if (!result.ok) {
+      setError(result.error || "Cannot add feature");
+      return;
+    }
+
+    setFeatures((prev) => [
+      ...prev,
+      {
+        id: result.data?.id,
+        featureName: newFeature.featureName,
+        featureValue: newFeature.featureValue,
+      },
+    ]);
+    setNewFeature({ featureName: "", featureValue: "" });
+  };
+
+  const handleDeleteFeature = async (feature: FeatureInput) => {
+    if (!vehicleId || !feature.id) {
+      setFeatures((prev) => prev.filter((item) => item !== feature));
+      return;
+    }
+
+    const result = await deleteVehicleFeatureAction(vehicleId, feature.id);
+    if (!result.ok) {
+      setError(result.error || "Cannot delete feature");
+      return;
+    }
+
+    setFeatures((prev) => prev.filter((item) => item.id !== feature.id));
+  };
+
+  if (isLoadingVehicle) {
+    return (
+      <div className="max-w-4xl mx-auto py-20 flex items-center justify-center gap-3 text-secondary">
+        <Loader2 className="animate-spin" size={20} />
+        <span>Loading vehicle...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-20">
-      {/* Header */}
+    <div className="max-w-5xl mx-auto space-y-8 pb-16">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
+            type="button"
             onClick={() => router.push("/admin/vehicles")}
             className="w-10 h-10 rounded-xl bg-white border border-outline-variant/20 flex items-center justify-center text-secondary hover:bg-surface-container transition-default"
           >
             <ChevronLeft size={20} />
           </button>
           <div>
-            <nav className="flex items-center gap-2 text-xs font-medium text-secondary mb-1">
-              <Link
-                href="/admin"
-                className="hover:text-primary transition-colors"
-              >
-                Đội xe
-              </Link>
-              <ChevronLeft size={10} className="rotate-180" />
-              <span className="text-on-surface">
-                {isEdit ? "Chỉnh sửa xe" : "Thêm xe mới"}
-              </span>
-            </nav>
             <h1 className="text-3xl font-bold text-on-surface">
-              {isEdit ? "Chỉnh sửa xe" : "Thêm xe mới"}
+              {isEdit ? "Edit Vehicle" : "Create Vehicle"}
             </h1>
             <p className="text-secondary text-sm">
               {isEdit
-                ? `Đang cập nhật ${formData.name}`
-                : "Nhập các thông số kỹ thuật và giá thuê để thêm xe mới vào hệ thống."}
+                ? "Update vehicle information and media"
+                : "Create a new vehicle using backend contract fields"}
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-3">
-          <button className="px-6 py-2.5 rounded-xl bg-white border border-outline-variant/20 text-sm font-bold text-secondary hover:bg-surface-container transition-default">
-            {isEdit ? "Khôi phục thay đổi" : "Lưu bản nháp"}
-          </button>
+          <Link
+            href="/admin/vehicles"
+            className="px-5 py-2.5 rounded-xl border border-outline-variant/20 text-sm font-bold text-secondary hover:bg-surface-container transition-default"
+          >
+            Cancel
+          </Link>
           <button
-            onClick={handleSubmit}
+            type="submit"
+            form="vehicle-form"
             disabled={isSubmitting}
-            className="px-8 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-container transition-default shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-container transition-default shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-60"
           >
             {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <Loader2 size={16} className="animate-spin" />
             ) : (
-              <CheckCircle2 size={18} />
+              <Save size={16} />
             )}
-            {isEdit ? "Cập nhật xe" : "Đăng ký xe"}
+            {isEdit ? "Save Changes" : "Create Vehicle"}
           </button>
         </div>
       </div>
 
-      <form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Basic Information */}
-          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
-            <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <Info size={20} />
-              </div>
-              <div>
-                <h2 className="font-bold text-on-surface">Thông tin cơ bản</h2>
-                <p className="text-xs text-secondary uppercase font-bold tracking-widest">
-                  Phần 01
-                </p>
-              </div>
-            </div>
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {success}
+        </div>
+      )}
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Tên hiển thị của xe
-                </label>
-                <input
-                  type="text"
-                  placeholder="ví dụ: Honda XR 150L Dual Sport"
-                  className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
-              </div>
+      <form id="vehicle-form" onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Name
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Slug
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.slug}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, slug: e.target.value }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Brand
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.brand}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, brand: e.target.value }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Model
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.model}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, model: e.target.value }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Year
+            <input
+              type="number"
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.year}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  year: Number(e.target.value),
+                }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            License Plate
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.licensePlate}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  licensePlate: e.target.value,
+                }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Price Per Day (VND)
+            <input
+              type="number"
+              min={1}
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.pricePerDay}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pricePerDay: Number(e.target.value),
+                }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Available Seats
+            <input
+              type="number"
+              min={1}
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.availableSeats}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  availableSeats: Number(e.target.value),
+                }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Fuel Type
+            <input
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.fuelType}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, fuelType: e.target.value }))
+              }
+              required
+            />
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Transmission
+            <select
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.transmission}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  transmission: e.target
+                    .value as (typeof transmissions)[number],
+                }))
+              }
+            >
+              {transmissions.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Type
+            <select
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.type}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  type: e.target.value as (typeof vehicleTypes)[number],
+                }))
+              }
+              disabled={isEdit}
+            >
+              {vehicleTypes.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2 text-sm font-medium text-secondary">
+            Category
+            <select
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+              value={formData.category}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  category: e.target.value as (typeof categories)[number],
+                }))
+              }
+              disabled={isEdit}
+            >
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="md:col-span-2 space-y-2 text-sm font-medium text-secondary">
+            Description
+            <textarea
+              className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface min-h-28"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+            />
+          </label>
+        </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Thương hiệu
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="ví dụ: Honda"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    value={formData.brand}
-                    onChange={(e) =>
-                      setFormData({ ...formData, brand: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Dòng xe
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="ví dụ: XR 150"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    value={formData.model}
-                    onChange={(e) =>
-                      setFormData({ ...formData, model: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Năm sản xuất
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="2024"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    value={formData.year}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        year: parseInt(e.target.value),
-                      })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Phân khúc xe
-                  </label>
-                  <select
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        category: e.target.value as VehicleCategory,
-                      })
-                    }
-                  >
-                    <option value="economy">Economy</option>
-                    <option value="comfort">Comfort</option>
-                    <option value="premium">Premium</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Loại xe
-                  </label>
-                  <select
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        type: e.target.value as VehicleType,
-                      })
-                    }
-                  >
-                    <option value="scooter">Scooter</option>
-                    <option value="motorcycle">Motorcycle</option>
-                    <option value="electric">Electric</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-secondary">
-                    Dung tích động cơ
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="ví dụ: 150"
-                      className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 pr-12"
-                      value={formData.engineSize}
-                      onChange={(e) =>
-                        setFormData({ ...formData, engineSize: e.target.value })
-                      }
-                    />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-secondary">
-                      cc
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Vehicle Gallery */}
-          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
-            <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <ImageIcon size={20} />
-              </div>
-              <div>
-                <h2 className="font-bold text-on-surface">Thư viện hình ảnh</h2>
-                <p className="text-xs text-secondary uppercase font-bold tracking-widest">
-                  Phần 02
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="border-2 border-dashed border-outline-variant/30 rounded-3xl p-12 text-center space-y-4 hover:border-primary/50 transition-colors cursor-pointer group">
-                <div className="w-16 h-16 bg-surface-container rounded-2xl flex items-center justify-center mx-auto group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                  <Upload size={32} />
-                </div>
-                <div>
-                  <p className="font-bold text-on-surface">
-                    Tải lên ảnh chất lượng cao
-                  </p>
-                  <p className="text-xs text-secondary">
-                    Kéo thả tệp PNG hoặc JPG vào đây (Tối đa 5MB mỗi tệp)
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="relative aspect-square rounded-2xl overflow-hidden border border-outline-variant/10 group">
-                  <img
-                    src="https://picsum.photos/seed/bike-add/400/400"
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    width={800}
-                    height={600}
-                  />
-                  <div className="absolute top-2 left-2 bg-primary text-white text-[8px] font-bold uppercase tracking-widest px-2 py-1 rounded-md">
-                    Ảnh bìa
-                  </div>
-                  <button className="absolute top-2 right-2 w-6 h-6 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-error opacity-0 group-hover:opacity-100 transition-opacity">
-                    <X size={14} />
-                  </button>
-                </div>
-                <button className="aspect-square rounded-2xl border-2 border-dashed border-outline-variant/20 flex flex-col items-center justify-center gap-2 text-secondary hover:border-primary/30 hover:text-primary transition-all">
-                  <Plus size={24} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">
-                    Thêm ảnh
-                  </span>
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Key Features & Description */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-6">
-              <div className="flex items-center gap-3 pb-4 border-b border-outline-variant/10">
-                <Zap size={18} className="text-primary" />
-                <h2 className="font-bold text-on-surface">Tiện ích đi kèm</h2>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {commonFeatures.map((feature) => (
-                  <button
-                    key={feature}
-                    type="button"
-                    onClick={() => handleFeatureToggle(feature)}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-xs font-bold transition-all border",
-                      formData.features.includes(feature)
-                        ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                        : "bg-surface-container/50 text-secondary border-outline-variant/20 hover:border-primary/30",
-                    )}
-                  >
-                    {feature}
-                  </button>
-                ))}
-                <button className="px-4 py-2 rounded-xl text-xs font-bold bg-white text-primary border border-dashed border-primary/30 flex items-center gap-1">
-                  <Plus size={14} />
-                  Tuỳ chỉnh
-                </button>
-              </div>
-            </section>
-
-            <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-6">
-              <div className="flex items-center gap-3 pb-4 border-b border-outline-variant/10">
-                <FileText size={18} className="text-primary" />
-                <h2 className="font-bold text-on-surface">Mô tả chi tiết</h2>
-              </div>
-              <textarea
-                placeholder="Viết một bản mô tả hấp dẫn để thu hút khách hàng thuê xe..."
-                className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-2xl py-4 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 h-40 resize-none"
-                value={formData.description}
+        {isEdit && (
+          <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-3">
+            <h3 className="font-bold text-on-surface">Vehicle Status</h3>
+            <div className="flex items-center gap-3">
+              <select
+                className="rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
+                value={formData.status}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: e.target.value as (typeof statuses)[number],
+                  }))
                 }
-              />
-              <div className="flex items-center gap-2 text-[10px] font-bold text-secondary uppercase tracking-widest">
-                <Info size={12} />
-                Thông tin này sẽ hiển thị công khai trên trang đặt xe của khách
-                hàng
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={handleStatusUpdate}
+                disabled={isUpdatingStatus}
+                className="px-4 py-2 rounded-xl bg-on-surface text-white text-sm font-bold hover:bg-on-surface/90 disabled:opacity-60"
+              >
+                {isUpdatingStatus ? "Updating..." : "Update Status"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-4">
+          <h3 className="font-bold text-on-surface flex items-center gap-2">
+            <ImageIcon size={16} /> Images
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-3">
+            <input
+              className="rounded-xl border border-outline-variant/20 px-3 py-2"
+              placeholder="Image URL"
+              value={newImage.url}
+              onChange={(e) =>
+                setNewImage((prev) => ({ ...prev, url: e.target.value }))
+              }
+            />
+            <input
+              className="rounded-xl border border-outline-variant/20 px-3 py-2"
+              placeholder="Alt text"
+              value={newImage.altText}
+              onChange={(e) =>
+                setNewImage((prev) => ({ ...prev, altText: e.target.value }))
+              }
+            />
+            <button
+              type="button"
+              onClick={handleAddImage}
+              className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold"
+            >
+              <Plus size={14} className="inline mr-1" /> Add
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {images.length === 0 && (
+              <p className="text-sm text-secondary">No images added.</p>
+            )}
+            {images.map((image, index) => (
+              <div
+                key={image.id || `${image.url}-${index}`}
+                className="flex items-center justify-between rounded-xl border border-outline-variant/20 px-3 py-2"
+              >
+                <div className="truncate">
+                  <p className="text-sm font-medium text-on-surface truncate">
+                    {image.url}
+                  </p>
+                  {image.altText && (
+                    <p className="text-xs text-secondary truncate">
+                      {image.altText}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteImage(image)}
+                  className="p-2 rounded-lg text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
-            </section>
+            ))}
           </div>
         </div>
 
-        <div className="space-y-8">
-          {/* Rental Pricing */}
-          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
-            <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <DollarSign size={20} />
-              </div>
-              <h2 className="font-bold text-on-surface">Bảng giá thuê (VNĐ)</h2>
-            </div>
+        <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-4">
+          <h3 className="font-bold text-on-surface flex items-center gap-2">
+            <Sparkles size={16} /> Features
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-3">
+            <input
+              className="rounded-xl border border-outline-variant/20 px-3 py-2"
+              placeholder="Feature name"
+              value={newFeature.featureName}
+              onChange={(e) =>
+                setNewFeature((prev) => ({
+                  ...prev,
+                  featureName: e.target.value,
+                }))
+              }
+            />
+            <input
+              className="rounded-xl border border-outline-variant/20 px-3 py-2"
+              placeholder="Feature value"
+              value={newFeature.featureValue}
+              onChange={(e) =>
+                setNewFeature((prev) => ({
+                  ...prev,
+                  featureValue: e.target.value,
+                }))
+              }
+            />
+            <button
+              type="button"
+              onClick={handleAddFeature}
+              className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold"
+            >
+              <Plus size={14} className="inline mr-1" /> Add
+            </button>
+          </div>
 
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Giá theo ngày
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="250,000"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 pr-16"
-                    value={formData.pricePerDay}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pricePerDay: parseInt(e.target.value),
-                      })
-                    }
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-secondary uppercase">
-                    VNĐ/Ngày
-                  </span>
+          <div className="space-y-2">
+            {features.length === 0 && (
+              <p className="text-sm text-secondary">No features added.</p>
+            )}
+            {features.map((feature, index) => (
+              <div
+                key={feature.id || `${feature.featureName}-${index}`}
+                className="flex items-center justify-between rounded-xl border border-outline-variant/20 px-3 py-2"
+              >
+                <div>
+                  <p className="text-sm font-medium text-on-surface">
+                    {feature.featureName}
+                  </p>
+                  <p className="text-xs text-secondary">
+                    {feature.featureValue}
+                  </p>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Giá theo tuần
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="1,500,000"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 pr-16"
-                    value={formData.weeklyRate}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        weeklyRate: parseInt(e.target.value),
-                      })
-                    }
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-secondary uppercase">
-                    VNĐ/Tuần
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Giá theo tháng
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="5,500,000"
-                    className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 pr-16"
-                    value={formData.monthlyRate}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        monthlyRate: parseInt(e.target.value),
-                      })
-                    }
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-secondary uppercase">
-                    VNĐ/Tháng
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Location & Status */}
-          <section className="bg-white rounded-4xl p-8 border border-outline-variant/10 shadow-sm space-y-8">
-            <div className="flex items-center gap-3 pb-6 border-b border-outline-variant/10">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                <MapPin size={20} />
-              </div>
-              <h2 className="font-bold text-on-surface">
-                Địa điểm & Trạng thái
-              </h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Chi nhánh quản lý
-                </label>
-                <select
-                  className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
+                <button
+                  type="button"
+                  onClick={() => handleDeleteFeature(feature)}
+                  className="p-2 rounded-lg text-red-600 hover:bg-red-50"
                 >
-                  <option value="">Chọn chi nhánh</option>
-                  <option value="Hanoi Old Quarter">Phố Cổ Hà Nội</option>
-                  <option value="Da Nang Beach">Biển Đà Nẵng</option>
-                  <option value="HCM District 1">HCM Quận 1</option>
-                </select>
+                  <Trash2 size={14} />
+                </button>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-secondary">
-                  Trạng thái kho
-                </label>
-                <select
-                  className="w-full bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({ ...formData, status: e.target.value })
-                  }
-                >
-                  <option value="available">Sẵn sàng cho thuê</option>
-                  <option value="maintenance">Đang bảo trì</option>
-                  <option value="unavailable">Ngưng hoạt động</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-3 pt-4">
-                <input
-                  type="checkbox"
-                  id="featured"
-                  className="w-5 h-5 rounded border-outline-variant/30 text-primary focus:ring-primary"
-                />
-                <label
-                  htmlFor="featured"
-                  className="text-sm font-bold text-on-surface"
-                >
-                  Đánh dấu là xe nổi bật
-                </label>
-              </div>
-            </div>
-          </section>
+            ))}
+          </div>
         </div>
       </form>
-
-      {/* Footer Actions */}
-      <div className="fixed bottom-0 left-64 right-0 bg-white/80 backdrop-blur-md border-t border-outline-variant/10 p-4 flex items-center justify-between z-10 px-12">
-        <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Systems Ready • 14:42
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/admin/vehicles")}
-            className="text-sm font-bold text-secondary hover:text-on-surface transition-colors"
-          >
-            Hủy bỏ thay đổi
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-10 py-3 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-container transition-default shadow-lg shadow-primary/20 disabled:opacity-50"
-          >
-            {isSubmitting
-              ? "Đang xử lý..."
-              : isEdit
-                ? "Cập nhật xe"
-                : "Đăng ký xe"}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

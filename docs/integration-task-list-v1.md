@@ -18,8 +18,8 @@ When returning in another session:
 ## Progress Snapshot
 
 - Last updated: 2026-03-23
-- Current phase: Public integration
-- Next recommended task: A2 - Admin vehicles list server fetch
+- Current phase: Admin integration complete
+- Next recommended task: Validation sweep and production QA
 
 ## Rules for all tasks
 
@@ -113,7 +113,7 @@ When returning in another session:
   - Acceptance:
     - admin transitions show loading fallback
 
-- [ ] A2 - Admin vehicles list server fetch
+- [x] A2 - Admin vehicles list server fetch
   - Scope: fetch vehicle list in admin vehicles page server-side
   - Files:
     - src/app/admin/vehicles/page.tsx
@@ -123,7 +123,7 @@ When returning in another session:
     - table receives server data
     - pagination and filter query params handled
 
-- [ ] A3 - Admin vehicle mutations via server actions
+- [x] A3 - Admin vehicle mutations via server actions
   - Scope: add create/update/status actions
   - Files:
     - src/app/admin/vehicles/actions.ts
@@ -137,7 +137,7 @@ When returning in another session:
     - all listed mutations go through server actions
     - success triggers revalidation
 
-- [ ] A4 - Admin vehicle image and feature actions
+- [x] A4 - Admin vehicle image and feature actions
   - Scope: integrate image and feature endpoints
   - Files:
     - src/app/admin/vehicles/actions.ts
@@ -151,7 +151,7 @@ When returning in another session:
   - Acceptance:
     - image and feature updates work end-to-end
 
-- [ ] A5 - Admin bookings list server fetch
+- [x] A5 - Admin bookings list server fetch
   - Scope: server-side list fetch with filters
   - Files:
     - src/app/admin/bookings/page.tsx
@@ -161,7 +161,7 @@ When returning in another session:
     - list renders from backend
     - filter state reflected in URL params
 
-- [ ] A6 - Admin booking status mutation
+- [x] A6 - Admin booking status mutation
   - Scope: status update via server action
   - Files:
     - src/app/admin/bookings/actions.ts
@@ -171,7 +171,7 @@ When returning in another session:
   - Acceptance:
     - status update persists and list refreshes
 
-- [ ] A7 - Replace remaining mock dependencies in admin pages
+- [x] A7 - Replace remaining mock dependencies in admin pages
   - Scope: remove mock data usage from integrated vehicle/booking pages
   - Files:
     - src/components/admin/BookingsTable.tsx
@@ -196,7 +196,14 @@ When returning in another session:
   - Decoupled mock datasets from BE contract types by introducing local mock booking interfaces in mock data files.
   - Completed P7: booking create now uses server action (`src/app/(public)/booking/actions.ts`) and client flow invokes typed server result.
   - Confirmed FE production build success after P7 + type cleanup (`npm run build`, exit code 0).
-  - Next task to continue: A2.
+  - Completed A2: moved admin vehicles list fetch to server in `src/app/admin/vehicles/page.tsx` using BE contract (`GET /admin/vehicles`) with query params.
+  - Updated `src/components/admin/VehicleTable.tsx` to consume server-provided data and drive pagination/filter via URL query params.
+  - Completed A3: added server actions for vehicle create/update/status in `src/app/admin/vehicles/actions.ts` and wired them into `src/components/admin/VehicleForm.tsx` and `src/components/admin/VehicleTable.tsx`.
+  - Completed A4: added vehicle image and feature server actions (add/delete/reorder) and integrated image/feature mutation flows in `src/components/admin/VehicleForm.tsx`.
+  - Completed A5: converted admin bookings page to server-side backend fetch in `src/app/admin/bookings/page.tsx` with URL-driven filters.
+  - Completed A6: added booking status server action in `src/app/admin/bookings/actions.ts` and integrated status updates in `src/components/admin/BookingsTable.tsx`.
+  - Completed A7: removed remaining admin/public mock dependencies by replacing dashboard, featured bikes, and sitemap data with backend fetches (`src/app/admin/page.tsx`, `src/components/admin/DashboardContent.tsx`, `src/components/home/FeaturedBikes.tsx`, `src/app/sitemap.ts`) and deleting unused mock-based `src/components/admin/BookingDetailDrawer.tsx`.
+  - Validation: no errors in all newly changed files; existing unrelated style suggestions remain in `src/components/home/HeroSection.tsx` and `src/components/booking/BookingStepper.tsx`.
 
 ## Verification checklist
 

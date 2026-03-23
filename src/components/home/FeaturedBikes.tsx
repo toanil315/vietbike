@@ -1,10 +1,50 @@
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
-import { VEHICLES } from '@/data/mockData';
-import BikeCard from '../bikes/BikeCard';
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import { vehicleEndpoints } from "@/lib/api-endpoints";
+import { Vehicle } from "@/types";
+import BikeCard from "../bikes/BikeCard";
 
-export default function FeaturedBikes() {
-  const featuredBikes = VEHICLES.slice(0, 4);
+interface VehiclesListResponse {
+  data: Vehicle[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+async function fetchFeaturedBikes(): Promise<Vehicle[]> {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const query = new URLSearchParams({ page: "1", pageSize: "4" });
+
+  try {
+    const response = await fetch(
+      `${apiBaseUrl}${vehicleEndpoints.list()}?${query.toString()}`,
+      { next: { revalidate: 300 } },
+    );
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const payload = (await response.json()) as {
+      success: boolean;
+      data?: VehiclesListResponse;
+    };
+
+    if (!payload.success || !payload.data) {
+      return [];
+    }
+
+    return payload.data.data.slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
+export default async function FeaturedBikes() {
+  const featuredBikes = await fetchFeaturedBikes();
 
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-8 py-32">
@@ -34,6 +74,11 @@ export default function FeaturedBikes() {
         {featuredBikes.map((bike, index) => (
           <BikeCard key={bike.id} bike={bike} index={index} />
         ))}
+        {featuredBikes.length === 0 && (
+          <div className="md:col-span-2 lg:col-span-4 rounded-3xl border border-outline-variant/20 bg-surface-container/30 p-8 text-center text-secondary">
+            Featured bikes are being updated. Please check back shortly.
+          </div>
+        )}
       </div>
     </section>
   );

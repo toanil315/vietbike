@@ -1,6 +1,7 @@
 "use client";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Plus,
   Search,
@@ -10,38 +11,55 @@ import {
   ChevronRight,
   Download,
   Upload,
-  Loader2,
-  AlertCircle,
 } from "lucide-react";
 import { formatPrice, cn } from "@/lib/utils";
-import { VehicleStatus } from "@/types";
-import Image from "next/image";
-import { useAdminVehicles } from "@/hooks/useAdminVehicles";
+import { Vehicle, VehicleStatus } from "@/types";
+import { updateVehicleStatusAction } from "@/app/admin/vehicles/actions";
+
+interface VehicleTableProps {
+  initialVehicles: Vehicle[];
+  initialPagination: {
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
+  initialFilters: {
+    search: string;
+    status: string;
+    type: string;
+  };
+}
 
 /**
  * Admin vehicle management table with API integration
  */
-export default function VehicleTable() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [locationFilter, setLocationFilter] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(20);
+export default function VehicleTable({
+  initialVehicles,
+  initialPagination,
+  initialFilters,
+}: VehicleTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Fetch vehicles from API
-  const {
-    data: vehicles,
-    pagination,
-    isLoading,
-    error,
-  } = useAdminVehicles(currentPage, pageSize, {
-    status: statusFilter || undefined,
-    type: typeFilter || undefined,
-    searchTerms: search ? [search] : undefined,
-  });
+  const [search, setSearch] = useState(initialFilters.search);
+  const [statusFilter, setStatusFilter] = useState(initialFilters.status);
+  const [typeFilter, setTypeFilter] = useState(initialFilters.type);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
-  const filteredVehicles = useMemo(() => vehicles, [vehicles]);
+  useEffect(() => {
+    setSearch(initialFilters.search);
+    setStatusFilter(initialFilters.status);
+    setTypeFilter(initialFilters.type);
+  }, [initialFilters.search, initialFilters.status, initialFilters.type]);
+
+  const filteredVehicles = useMemo(() => {
+    if (!typeFilter) {
+      return initialVehicles;
+    }
+
+    return initialVehicles.filter((vehicle) => vehicle.type === typeFilter);
+  }, [initialVehicles, typeFilter]);
 
   const statusColors: Record<VehicleStatus, string> = {
     available: "bg-emerald-100 text-emerald-700",
@@ -50,28 +68,93 @@ export default function VehicleTable() {
     unavailable: "bg-slate-100 text-slate-700",
   };
 
-  const statusLabels: Record<VehicleStatus, string> = {
-    available: "Có sẵn",
-    rented: "Đang cho thuê",
-    maintenance: "Bảo trì",
-    unavailable: "Không sẵn có",
-  };
+  const updateQueryParams = useCallback(
+    (overrides: Record<string, string | number | undefined>) => {
+      const params = new URLSearchParams();
+
+      const nextSearch =
+        overrides.search !== undefined
+          ? String(overrides.search)
+          : (search ?? "");
+      const nextStatus =
+        overrides.status !== undefined
+          ? String(overrides.status)
+          : (statusFilter ?? "");
+      const nextType =
+        overrides.type !== undefined
+          ? String(overrides.type)
+          : (typeFilter ?? "");
+      const nextPage =
+        overrides.page !== undefined
+          ? Number(overrides.page)
+          : initialPagination.page;
+
+      if (nextSearch) params.set("search", nextSearch);
+      if (nextStatus) params.set("status", nextStatus);
+      if (nextType) params.set("type", nextType);
+      params.set("page", String(Math.max(1, nextPage)));
+      params.set("pageSize", String(initialPagination.pageSize));
+
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
+    },
+    [
+      search,
+      statusFilter,
+      typeFilter,
+      initialPagination.page,
+      initialPagination.pageSize,
+      pathname,
+      router,
+    ],
+  );
+
+  const applyFilters = useCallback(() => {
+    updateQueryParams({
+      search,
+      status: statusFilter,
+      type: typeFilter,
+      page: 1,
+    });
+  }, [search, statusFilter, typeFilter, updateQueryParams]);
 
   /**
    * Handle previous page
    */
   const handlePreviousPage = useCallback(() => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  }, []);
+    updateQueryParams({ page: Math.max(1, initialPagination.page - 1) });
+  }, [initialPagination.page, updateQueryParams]);
 
   /**
    * Handle next page
    */
   const handleNextPage = useCallback(() => {
-    setCurrentPage((prev) =>
-      prev < (pagination.pages || 1) ? prev + 1 : prev,
-    );
-  }, [pagination.pages]);
+    if (initialPagination.page >= initialPagination.totalPages) {
+      return;
+    }
+    updateQueryParams({ page: initialPagination.page + 1 });
+  }, [initialPagination.page, initialPagination.totalPages, updateQueryParams]);
+
+  const showingFrom =
+    initialPagination.total === 0
+      ? 0
+      : (initialPagination.page - 1) * initialPagination.pageSize + 1;
+  const showingTo =
+    initialPagination.total === 0
+      ? 0
+      : Math.min(
+          initialPagination.page * initialPagination.pageSize,
+          initialPagination.total,
+        );
+
+  const handleStatusChange = useCallback(
+    async (vehicleId: string, status: VehicleStatus) => {
+      setUpdatingStatusId(vehicleId);
+      await updateVehicleStatusAction(vehicleId, status);
+      setUpdatingStatusId(null);
+    },
+    [],
+  );
 
   return (
     <div className="space-y-8">
@@ -115,6 +198,11 @@ export default function VehicleTable() {
               placeholder="Tìm theo tên, biển số hoặc ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  applyFilters();
+                }
+              }}
               className="w-full pl-12 pr-4 py-3 bg-surface-container/50 border border-outline-variant/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -124,10 +212,11 @@ export default function VehicleTable() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none"
           >
-            <option>Tất cả trạng thái</option>
-            <option>Available</option>
-            <option>Rented</option>
-            <option>Maintenance</option>
+            <option value="">Tất cả trạng thái</option>
+            <option value="available">Available</option>
+            <option value="rented">Rented</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="unavailable">Unavailable</option>
           </select>
 
           <select
@@ -135,25 +224,26 @@ export default function VehicleTable() {
             onChange={(e) => setTypeFilter(e.target.value)}
             className="bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none"
           >
-            <option>Tất cả loại xe</option>
-            <option>Automatic</option>
-            <option>Manual</option>
-            <option>Electric</option>
+            <option value="">Tất cả loại xe</option>
+            <option value="motorcycle">Motorcycle</option>
+            <option value="scooter">Scooter</option>
+            <option value="electric">Electric</option>
           </select>
 
-          <select
-            value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-            className="bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none"
+          <button
+            type="button"
+            onClick={applyFilters}
+            className="p-3 rounded-xl bg-surface-container/50 border border-outline-variant/20 text-secondary hover:text-primary transition-default"
           >
-            <option>Tất cả địa điểm</option>
-            <option>Ho Chi Minh</option>
-            <option>Hanoi</option>
-            <option>Da Nang</option>
-          </select>
-
-          <button className="p-3 rounded-xl bg-surface-container/50 border border-outline-variant/20 text-secondary hover:text-primary transition-default">
             <Filter size={18} />
+          </button>
+
+          <button
+            type="button"
+            onClick={applyFilters}
+            className="px-4 py-3 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-container transition-default"
+          >
+            Áp dụng
           </button>
         </div>
       </div>
@@ -254,6 +344,22 @@ export default function VehicleTable() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <select
+                        value={vehicle.status}
+                        onChange={(e) =>
+                          handleStatusChange(
+                            vehicle.id,
+                            e.target.value as VehicleStatus,
+                          )
+                        }
+                        disabled={updatingStatusId === vehicle.id}
+                        className="text-xs rounded-lg border border-outline-variant/20 px-2 py-1 bg-white"
+                      >
+                        <option value="available">available</option>
+                        <option value="rented">rented</option>
+                        <option value="maintenance">maintenance</option>
+                        <option value="unavailable">unavailable</option>
+                      </select>
                       <Link
                         href={`/admin/vehicles/${vehicle.id}`}
                         className="p-2 rounded-lg text-secondary hover:bg-primary/10 hover:text-primary transition-default"
@@ -273,34 +379,32 @@ export default function VehicleTable() {
           <p className="text-sm text-secondary">
             Đang hiển thị{" "}
             <span className="font-bold text-on-surface">
-              1-{filteredVehicles.length}
+              {showingFrom}-{showingTo}
             </span>{" "}
             trên tổng số{" "}
             <span className="font-bold text-on-surface">
-              {filteredVehicles.length}
+              {initialPagination.total}
             </span>
           </p>
           <div className="flex items-center gap-2">
             <button
               className="p-2 rounded-lg border border-outline-variant/20 text-secondary hover:bg-white transition-default disabled:opacity-50"
-              disabled
+              onClick={handlePreviousPage}
+              disabled={initialPagination.page <= 1}
             >
               <ChevronLeft size={18} />
             </button>
             <button className="w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold">
-              1
+              {initialPagination.page}
             </button>
-            <button className="w-8 h-8 rounded-lg text-sm font-bold text-secondary hover:bg-white transition-default">
-              2
-            </button>
-            <button className="w-8 h-8 rounded-lg text-sm font-bold text-secondary hover:bg-white transition-default">
-              3
-            </button>
-            <span className="text-secondary">...</span>
-            <button className="w-8 h-8 rounded-lg text-sm font-bold text-secondary hover:bg-white transition-default">
-              8
-            </button>
-            <button className="p-2 rounded-lg border border-outline-variant/20 text-secondary hover:bg-white transition-default">
+            <span className="text-sm text-secondary font-medium">
+              / {Math.max(1, initialPagination.totalPages)}
+            </span>
+            <button
+              className="p-2 rounded-lg border border-outline-variant/20 text-secondary hover:bg-white transition-default disabled:opacity-50"
+              onClick={handleNextPage}
+              disabled={initialPagination.page >= initialPagination.totalPages}
+            >
               <ChevronRight size={18} />
             </button>
           </div>

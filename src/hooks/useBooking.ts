@@ -10,19 +10,12 @@ import apiClient from "@/lib/api";
 import { bookingEndpoints, voucherEndpoints } from "@/lib/api-endpoints";
 import { Booking } from "@/types";
 import { handleApiError, AppError } from "@/lib/error-handler";
-import {
-  validateData,
-  bookingRequestSchema,
-  type BookingRequestInput,
-} from "@/lib/validation";
 import { useBookingStore } from "@/store/bookingStore";
 
 interface CreateBookingParams {
-  vehicleId: string;
+  licensePlate: string;
   startDate: Date;
   endDate: Date;
-  pickupLocationId: string;
-  dropoffLocationId: string;
   customerInfo: {
     name: string;
     email: string;
@@ -30,9 +23,10 @@ interface CreateBookingParams {
     nationality: string;
     licenseNumber: string;
   };
-  addons?: string[];
   voucherCode?: string;
-  paymentMethod: "cash" | "bank_transfer";
+  sourceApp?: string;
+  totalAmount?: number;
+  depositAmount?: number;
 }
 
 /**
@@ -52,38 +46,27 @@ export function useCreateBooking() {
         setIsLoading(true);
         setError(null);
 
-        // Validate booking data
-        const bookingData: BookingRequestInput = {
-          vehicleId: params.vehicleId,
-          startDate: params.startDate,
-          endDate: params.endDate,
-          pickupLocationId: params.pickupLocationId,
-          dropoffLocationId: params.dropoffLocationId,
-          customerInfo: params.customerInfo,
-          addons: params.addons || [],
-          voucherCode: params.voucherCode,
-          paymentMethod: params.paymentMethod,
-        };
+        const rentalDays = Math.max(
+          1,
+          Math.ceil(
+            (params.endDate.getTime() - params.startDate.getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+        );
 
-        const validation = validateData(bookingRequestSchema, bookingData);
-        if (!validation.success) {
-          const appError: AppError = {
-            code: "VALIDATION_ERROR",
-            message: "Booking validation failed",
-            userMessage: "Please check your booking details and try again.",
-            statusCode: 400,
-            details: validation.errors,
-            timestamp: new Date(),
-          };
-          setError(appError);
-          throw appError;
-        }
-
-        // Convert dates to ISO strings for API
         const requestData = {
-          ...bookingData,
-          startDate: params.startDate.toISOString().split("T")[0],
-          endDate: params.endDate.toISOString().split("T")[0],
+          customerName: params.customerInfo.name,
+          customerPhone: params.customerInfo.phone,
+          sourceApp: params.sourceApp || "web",
+          licensePlate: params.licensePlate,
+          startDate: params.startDate.toISOString(),
+          rentalDays,
+          totalAmount: params.totalAmount || 0,
+          depositAmount: params.depositAmount || 0,
+          note: params.customerInfo.email
+            ? `Customer email: ${params.customerInfo.email}`
+            : undefined,
+          voucherCode: params.voucherCode,
         };
 
         const endpoint = bookingEndpoints.create();
@@ -184,9 +167,10 @@ export function useCustomerBookings(
         const params = new URLSearchParams({
           page: page.toString(),
           pageSize: pageSize.toString(),
+          ...(customerId && { customerId }),
         });
 
-        const endpoint = `${bookingEndpoints.myBookings(customerId)}?${params.toString()}`;
+        const endpoint = `${bookingEndpoints.list()}?${params.toString()}`;
         const response = await apiClient.get<{
           bookings: Booking[];
           pagination: typeof pagination;

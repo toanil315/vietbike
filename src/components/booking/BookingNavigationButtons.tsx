@@ -51,7 +51,7 @@ export function BookingNavigationButtons({
             {isSubmitting
               ? "Processing..."
               : showConfirmButton
-                ? "Confirm Booking"
+                ? "Send Booking Request"
                 : "Next"}
             {!isSubmitting && <ChevronRight size={20} />}
           </button>
@@ -83,7 +83,7 @@ export function BookingNavigationButtons({
         {isSubmitting
           ? "Processing..."
           : showConfirmButton
-            ? "Confirm Booking"
+            ? "Send Booking Request"
             : "Next Step"}
         {!isSubmitting && (
           <ChevronRight

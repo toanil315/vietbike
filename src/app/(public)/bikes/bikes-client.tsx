@@ -32,7 +32,6 @@ export default function BikesClient({
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const city = searchParams.get("city") || "All Cities";
   const brand = searchParams.get("brand") || "Any Brand";
   const type = searchParams.get("type")
     ? `${searchParams.get("type")!.charAt(0).toUpperCase()}${searchParams
@@ -94,13 +93,6 @@ export default function BikesClient({
 
     const nextQuery = params.toString();
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
-  }
-
-  function handleCityChange(value: string) {
-    updateRoute({
-      city: value === "All Cities" ? undefined : value,
-      page: "1",
-    });
   }
 
   function handleBrandChange(value: string) {
@@ -176,7 +168,6 @@ export default function BikesClient({
         <button
           onClick={() => {
             updateRoute({
-              city: undefined,
               brand: undefined,
               type: undefined,
               transmission: undefined,
@@ -290,8 +281,6 @@ export default function BikesClient({
     <>
       <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
         <BikeFilterBar
-          city={city}
-          setCity={handleCityChange}
           type={type}
           setType={handleTypeChange}
           brand={brand}

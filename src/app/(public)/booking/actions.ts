@@ -3,13 +3,22 @@
 import { bookingEndpoints } from "@/lib/api-endpoints";
 
 export interface CreateBookingActionInput {
-  vehicleId: string;
-  pickupLocationId: string;
-  dropoffLocationId: string;
-  pickupDate: string;
-  dropoffDate: string;
-  paymentMethod: "cash" | "card" | "bank_transfer" | "wallet";
-  addons: Array<{ addonId: string; quantity: number }>;
+  customerName: string;
+  customerPhone: string;
+  sourceApp: string;
+  licensePlate: string;
+  startDate: string;
+  rentalDays: number;
+  totalAmount: number;
+  depositAmount: number;
+  extensionInfo?: string;
+  note?: string;
+  documents?: Array<{
+    name: string;
+    url?: string;
+    mimeType?: string;
+    sizeBytes?: number;
+  }>;
   voucherCode?: string;
 }
 
@@ -27,24 +36,12 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 export async function createBookingAction(
   input: CreateBookingActionInput,
 ): Promise<CreateBookingActionResult> {
-  const customerId = process.env.BOOKING_CUSTOMER_ID;
-  if (!customerId) {
-    return {
-      success: false,
-      error:
-        "Server config missing BOOKING_CUSTOMER_ID. Set this env var to an existing customer UUID before creating bookings.",
-    };
-  }
-
   const response = await fetch(`${API_BASE_URL}${bookingEndpoints.create()}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      ...input,
-      customerId,
-    }),
+    body: JSON.stringify(input),
     cache: "no-store",
   });
 

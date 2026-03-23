@@ -2,16 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { User, Package, CreditCard } from "lucide-react";
+import { User, CreditCard } from "lucide-react";
 import { useBookingStore } from "@/store/bookingStore";
-import { useAddons } from "@/hooks/useLocations";
-import { ADDONS } from "@/data/mockData";
 import { AnimatePresence, motion } from "motion/react";
 import BookingStepper from "./BookingStepper";
 import CustomerInfoForm from "./CustomerInfoForm";
-import AddonsSelector from "./AddonsSelector";
-import LocationSelector from "./LocationSelector";
-import PaymentMethodSelector from "./PaymentMethodSelector";
 import BookingSummary from "./BookingSummary";
 import RentalDatePicker from "./RentalDatePicker";
 import { BookingNavigationButtons } from "./BookingNavigationButtons";
@@ -21,30 +16,25 @@ import { useBookingSubmit } from "./hooks/useBookingSubmit";
 import { calculateBookingTotal } from "./handlers/bookingHandlers";
 
 const steps = [
-  { id: 1, name: "Identity & Plan", icon: User },
-  { id: 2, name: "Services & Location", icon: Package },
-  { id: 3, name: "Checkout", icon: CreditCard },
+  { id: 1, name: "Booking Form", icon: User },
+  { id: 2, name: "Review & Confirm", icon: CreditCard },
 ];
 
 export default function BookingFlow() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const isMobile = useMobile();
   const {
     step,
     setStep,
     vehicle,
-    selectedAddons,
     customerInfo,
     startDate,
     endDate,
-    pickupLocation,
-    dropoffLocation,
-    paymentMethod,
+    sourceApp,
+    note,
   } = useBookingStore();
-
-  const { data: apiAddons } = useAddons();
-  const addons = apiAddons && apiAddons.length > 0 ? apiAddons : ADDONS;
 
   const { handleBookingSubmit, isSubmitting, error } = useBookingSubmit();
 
@@ -67,12 +57,28 @@ export default function BookingFlow() {
    * Handle next step or booking submission
    */
   const handleNextStep = useCallback(async () => {
-    if (step < 3) {
+    if (step < 2) {
+      if (!customerInfo.name.trim()) {
+        setValidationError("Please enter your full name.");
+        return;
+      }
+      if (!customerInfo.phone.trim()) {
+        setValidationError("Please enter your phone number.");
+        return;
+      }
+      if (!startDate || !endDate) {
+        setValidationError("Please select a valid rental period.");
+        return;
+      }
+
+      setValidationError(null);
       setStep(step + 1);
     } else {
       if (!vehicle) {
         return;
       }
+
+      setValidationError(null);
 
       // Submit booking
       await handleBookingSubmit({
@@ -80,10 +86,8 @@ export default function BookingFlow() {
         customerInfo,
         startDate,
         endDate,
-        pickupLocation,
-        dropoffLocation,
-        selectedAddons,
-        paymentMethod,
+        sourceApp,
+        note,
       });
     }
   }, [
@@ -93,10 +97,8 @@ export default function BookingFlow() {
     customerInfo,
     startDate,
     endDate,
-    pickupLocation,
-    dropoffLocation,
-    selectedAddons,
-    paymentMethod,
+    sourceApp,
+    note,
     handleBookingSubmit,
   ]);
 
@@ -106,13 +108,7 @@ export default function BookingFlow() {
     return <BookingEmptyState />;
   }
 
-  const total = calculateBookingTotal(
-    vehicle,
-    startDate,
-    endDate,
-    selectedAddons,
-    addons,
-  );
+  const total = calculateBookingTotal(vehicle, startDate, endDate);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -144,21 +140,20 @@ export default function BookingFlow() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="space-y-8"
                   >
-                    <AddonsSelector />
-                    <LocationSelector />
-                  </motion.div>
-                )}
-
-                {step === 3 && (
-                  <motion.div
-                    key="step3"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
-                    <PaymentMethodSelector />
+                    <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-outline-variant/10 space-y-4">
+                      <h2 className="text-2xl font-bold text-on-surface">
+                        Review Before Sending
+                      </h2>
+                      <p className="text-secondary">
+                        Verify customer details, rental schedule, and total on
+                        the summary card. Submit when everything is correct.
+                      </p>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                        Your request will be sent directly to the unified
+                        booking endpoint and staff will confirm shortly.
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </>
@@ -174,17 +169,22 @@ export default function BookingFlow() {
                   >
                     <CustomerInfoForm />
                     <RentalDatePicker />
-                    <LocationSelector />
-                    <AddonsSelector />
                   </motion.div>
                 )}
-                {step === 3 && (
+                {step === 2 && (
                   <motion.div
                     key="mobile-payment"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <PaymentMethodSelector />
+                    <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-outline-variant/10 space-y-4">
+                      <h2 className="text-2xl font-bold text-on-surface">
+                        Review Before Sending
+                      </h2>
+                      <p className="text-secondary">
+                        Review the summary and submit your booking request.
+                      </p>
+                    </div>
                   </motion.div>
                 )}
               </>
@@ -198,13 +198,19 @@ export default function BookingFlow() {
             onPrevious={handlePreviousStep}
             isSubmitting={isSubmitting}
             isMobile={isMobile}
-            showConfirmButton={step === 3}
+            showConfirmButton={step === 2}
           />
 
           {/* Error message display */}
           {error && (
             <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-600 text-sm">
               {error}
+            </div>
+          )}
+
+          {validationError && (
+            <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-700 text-sm">
+              {validationError}
             </div>
           )}
         </div>

@@ -6,8 +6,6 @@ interface BookingState {
   vehicle: Vehicle | null;
   startDate: string;
   endDate: string;
-  pickupLocation: string;
-  dropoffLocation: string;
   customerInfo: {
     name: string;
     email: string;
@@ -15,9 +13,9 @@ interface BookingState {
     nationality: string;
     licenseNumber: string;
   };
-  selectedAddons: string[];
-  paymentMethod: string;
   voucherCode: string;
+  sourceApp: string;
+  note: string;
   bookingReference: string | null;
   bookingId: string | null;
   calculatedPrice: number | null;
@@ -30,11 +28,10 @@ interface BookingState {
   setStep: (step: number) => void;
   setVehicle: (vehicle: Vehicle) => void;
   setDates: (start: string, end: string) => void;
-  setLocations: (pickup: string, dropoff: string) => void;
   setCustomerInfo: (info: Partial<BookingState["customerInfo"]>) => void;
-  toggleAddon: (addonId: string) => void;
-  setPaymentMethod: (method: string) => void;
   setVoucherCode: (code: string) => void;
+  setSourceApp: (sourceApp: string) => void;
+  setNote: (note: string) => void;
   setPricing: (pricing: Record<string, number | null>) => void;
   setBookingReference: (reference: string, id: string) => void;
   setError: (error: string | null) => void;
@@ -48,8 +45,6 @@ export const useBookingStore = create<BookingState>((set) => ({
   vehicle: null,
   startDate: "",
   endDate: "",
-  pickupLocation: "",
-  dropoffLocation: "",
   customerInfo: {
     name: "",
     email: "",
@@ -57,9 +52,9 @@ export const useBookingStore = create<BookingState>((set) => ({
     nationality: "",
     licenseNumber: "",
   },
-  selectedAddons: [],
-  paymentMethod: "",
   voucherCode: "",
+  sourceApp: "web",
+  note: "",
   bookingReference: null,
   bookingId: null,
   calculatedPrice: null,
@@ -72,20 +67,13 @@ export const useBookingStore = create<BookingState>((set) => ({
   setStep: (step) => set({ step }),
   setVehicle: (vehicle) => set({ vehicle }),
   setDates: (startDate, endDate) => set({ startDate, endDate }),
-  setLocations: (pickupLocation, dropoffLocation) =>
-    set({ pickupLocation, dropoffLocation }),
   setCustomerInfo: (info) =>
     set((state) => ({
       customerInfo: { ...state.customerInfo, ...info },
     })),
-  toggleAddon: (addonId) =>
-    set((state) => ({
-      selectedAddons: state.selectedAddons.includes(addonId)
-        ? state.selectedAddons.filter((id) => id !== addonId)
-        : [...state.selectedAddons, addonId],
-    })),
-  setPaymentMethod: (paymentMethod) => set({ paymentMethod }),
   setVoucherCode: (voucherCode) => set({ voucherCode }),
+  setSourceApp: (sourceApp) => set({ sourceApp }),
+  setNote: (note) => set({ note }),
   setPricing: (pricing) => set(pricing),
   setBookingReference: (reference, id) =>
     set({
@@ -103,8 +91,6 @@ export const useBookingStore = create<BookingState>((set) => ({
       vehicle: null,
       startDate: "",
       endDate: "",
-      pickupLocation: "",
-      dropoffLocation: "",
       customerInfo: {
         name: "",
         email: "",
@@ -112,9 +98,9 @@ export const useBookingStore = create<BookingState>((set) => ({
         nationality: "",
         licenseNumber: "",
       },
-      selectedAddons: [],
-      paymentMethod: "",
       voucherCode: "",
+      sourceApp: "web",
+      note: "",
       bookingReference: null,
       bookingId: null,
       calculatedPrice: null,

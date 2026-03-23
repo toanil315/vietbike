@@ -11,6 +11,15 @@ Primary goals:
 - Deterministic data flow using server data fetch + server actions for mutations
 - Public-first delivery sequence, then admin
 
+## Booking Contract Update (March 2026)
+
+- Booking creation route is unified to `POST /bookings` for both public and admin flows.
+- Public booking form should map directly to backend manual-form payload fields.
+- UI state still uses customer-friendly controls (date range and summary), but submission must include:
+  - `customerName`, `customerPhone`, `sourceApp`, `licensePlate`
+  - `startDate`, `rentalDays`, `totalAmount`, `depositAmount`
+  - optional `note`, `documents[]`, `voucherCode`
+
 ## Current state summary
 
 - App Router is in use

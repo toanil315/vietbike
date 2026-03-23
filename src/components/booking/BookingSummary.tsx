@@ -2,10 +2,8 @@
 
 import { Star, ShieldCheck, Zap, AlertCircle } from "lucide-react";
 import { useBookingStore } from "@/store/bookingStore";
-import { ADDONS } from "@/data/mockData";
 import { formatPrice } from "@/lib/utils";
 import { Vehicle } from "@/types";
-import Image from "next/image";
 import { useMemo, useEffect, useState } from "react";
 
 interface BookingSummaryProps {
@@ -17,8 +15,7 @@ export default function BookingSummary({
   vehicle,
   calculateTotal,
 }: BookingSummaryProps) {
-  const { selectedAddons, voucherCode, startDate, endDate, discountAmount } =
-    useBookingStore();
+  const { voucherCode, startDate, endDate, discountAmount } = useBookingStore();
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Ensure hydration match
@@ -38,22 +35,13 @@ export default function BookingSummary({
   // Calculate pricing breakdown
   const rentalCost = vehicle.pricePerDay * rentalDays;
 
-  // Calculate addons cost
-  const selectedAddonsData = selectedAddons
-    .map((id) => ADDONS.find((a) => a.id === id))
-    .filter(Boolean) as any[];
-
-  const addonsCost = selectedAddonsData.reduce((total, addon) => {
-    return total + (addon?.price || 0) * rentalDays;
-  }, 0);
-
-  const subtotal = rentalCost + addonsCost;
+  const subtotal = rentalCost;
   // Simple tax calculation (10%)
   const tax = Math.round(subtotal * 0.1);
   const total = calculateTotal();
 
   const hasDateRange = startDate && endDate;
-  const hasMissingInfo = !hasDateRange && selectedAddons.length === 0;
+  const hasMissingInfo = !hasDateRange;
   const primaryImageUrl = vehicle.images?.[0]?.url;
 
   return (
@@ -115,31 +103,8 @@ export default function BookingSummary({
             </div>
           )}
 
-          {/* Addons */}
-          {selectedAddonsData.length > 0 && (
-            <div className="space-y-3 pt-2 border-t border-outline-variant/10">
-              <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">
-                Add-ons
-              </p>
-              {selectedAddonsData.map((addon, idx) => (
-                <div
-                  key={idx}
-                  className="flex justify-between items-center text-sm"
-                >
-                  <span className="text-secondary font-medium">
-                    {addon?.name}
-                    {rentalDays > 1 && ` x${rentalDays}`}
-                  </span>
-                  <span className="font-bold text-primary">
-                    {formatPrice((addon?.price || 0) * rentalDays)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Subtotal */}
-          {(hasDateRange || selectedAddonsData.length > 0) && (
+          {hasDateRange && (
             <div className="pt-4 border-t border-outline-variant/10 flex justify-between items-center text-sm">
               <span className="text-secondary font-medium">Subtotal</span>
               <span className="font-bold">{formatPrice(subtotal)}</span>
@@ -232,7 +197,7 @@ export default function BookingSummary({
               Complete Your Booking
             </p>
             <p className="text-xs text-amber-600 mt-1">
-              Please select pickup/return dates to see your final price.
+              Please select rental dates to see your final price.
             </p>
           </div>
         </div>

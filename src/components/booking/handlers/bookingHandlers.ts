@@ -6,13 +6,22 @@
 import { Vehicle } from "@/types";
 
 export interface BookingFormData {
-  vehicleId: string;
-  pickupDate: string;
-  dropoffDate: string;
-  pickupLocationId: string;
-  dropoffLocationId: string;
-  addons: Array<{ addonId: string; quantity: number }>;
-  paymentMethod: "cash" | "card" | "bank_transfer" | "wallet";
+  customerName: string;
+  customerPhone: string;
+  sourceApp: string;
+  licensePlate: string;
+  startDate: string;
+  rentalDays: number;
+  totalAmount: number;
+  depositAmount: number;
+  note?: string;
+  documents?: Array<{
+    name: string;
+    url?: string;
+    mimeType?: string;
+    sizeBytes?: number;
+  }>;
+  voucherCode?: string;
 }
 
 /**
@@ -36,18 +45,11 @@ export function calculateBookingTotal(
   vehicle: Vehicle,
   startDate: string,
   endDate: string,
-  selectedAddons: string[],
-  addons: any[],
 ): number {
   const days = calculateRentalDays(startDate, endDate);
   if (days <= 0) return 0;
 
-  let total = vehicle.pricePerDay * days;
-  selectedAddons.forEach((id) => {
-    const addon = addons.find((a) => a.id === id);
-    if (addon) total += addon.price * days;
-  });
-  return total;
+  return vehicle.pricePerDay * days;
 }
 
 /**
@@ -55,32 +57,33 @@ export function calculateBookingTotal(
  */
 export function prepareBookingData(
   vehicle: Vehicle,
-  _customerInfo: Record<string, string>,
+  customerInfo: Record<string, string>,
   startDate: string,
   endDate: string,
-  pickupLocation: string,
-  dropoffLocation: string,
-  selectedAddons: string[],
-  paymentMethod: string,
+  sourceApp: string,
+  customerNote?: string,
 ): BookingFormData {
+  const rentalDays = calculateRentalDays(startDate, endDate) || 1;
+  const totalAmount = calculateBookingTotal(vehicle, startDate, endDate);
+
+  const noteParts = [
+    customerInfo.email ? `Email: ${customerInfo.email}` : "",
+    customerInfo.nationality ? `Nationality: ${customerInfo.nationality}` : "",
+    customerInfo.licenseNumber ? `License: ${customerInfo.licenseNumber}` : "",
+    customerNote ? `Note: ${customerNote}` : "",
+  ].filter(Boolean);
+
   return {
-    vehicleId: vehicle?.id || "",
-    pickupDate: startDate
+    customerName: customerInfo.name || "",
+    customerPhone: customerInfo.phone || "",
+    sourceApp: sourceApp || "web",
+    licensePlate: vehicle?.licensePlate || "",
+    startDate: startDate
       ? new Date(startDate).toISOString()
       : new Date().toISOString(),
-    dropoffDate: endDate
-      ? new Date(endDate).toISOString()
-      : new Date().toISOString(),
-    pickupLocationId: pickupLocation || "",
-    dropoffLocationId: dropoffLocation || "",
-    addons: (selectedAddons || []).map((addonId) => ({
-      addonId,
-      quantity: 1,
-    })),
-    paymentMethod: (paymentMethod || "cash") as
-      | "cash"
-      | "card"
-      | "bank_transfer"
-      | "wallet",
+    rentalDays,
+    totalAmount,
+    depositAmount: 0,
+    note: noteParts.length > 0 ? noteParts.join(" | ") : undefined,
   };
 }

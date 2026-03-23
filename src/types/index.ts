@@ -88,15 +88,17 @@ export interface Booking {
   id: string;
   reference: string;
   vehicleId: string;
-  customerId: string;
-  pickupLocationId: string;
-  dropoffLocationId: string;
   pickupDate: string;
   dropoffDate: string;
   status: BookingStatus;
   totalAmount: number;
-  addons: BookingAddon[];
-  paymentMethod: string;
+  customerInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    nationality?: string;
+    licenseNumber?: string;
+  };
   voucherCode?: string;
   voucherDiscount: number;
   createdAt: string;

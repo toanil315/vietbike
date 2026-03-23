@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   CheckCircle2,
   Calendar,
-  MapPin,
   Home,
   Download,
   Share2,
@@ -22,15 +21,8 @@ import { formatPrice } from "@/lib/utils";
 import { VEHICLES } from "@/data/mockData";
 
 export default function BookingConfirmation() {
-  const {
-    vehicle,
-    customerInfo,
-    resetBooking,
-    pickupLocation,
-    dropoffLocation,
-    startDate,
-    endDate,
-  } = useBookingStore();
+  const { vehicle, customerInfo, resetBooking, startDate, endDate } =
+    useBookingStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
@@ -94,10 +86,6 @@ RENTAL PERIOD
 Check-in: ${startDate || "N/A"}
 Check-out: ${endDate || "N/A"}
 Duration: ${numberOfDays} days
-
-PICKUP & RETURN
-Pickup Location: ${pickupLocation || "N/A"}
-Return Location: ${dropoffLocation || "N/A"}
 
 PRICING
 Daily Rate: ${formatPrice(displayVehicle?.pricePerDay || 0)}
@@ -322,41 +310,6 @@ Contact: support@vietbike.com | +84 1234 567 890
                     <p className="font-bold text-on-surface">
                       {customerInfo.phone || "Not provided"}
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pickup Location */}
-              <div className="space-y-4">
-                <h3 className="text-[10px] font-bold text-secondary uppercase tracking-widest">
-                  📍 Pickup & Return
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-4 bg-surface-container/30 p-4 rounded-2xl border border-outline-variant/10">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-emerald-600 shadow-sm">
-                      <MapPin size={20} />
-                    </div>
-                    <div>
-                      <p className="text-xs text-secondary font-medium mb-0.5">
-                        Pickup
-                      </p>
-                      <p className="text-sm font-bold text-on-surface">
-                        {pickupLocation || "Da Nang Airport"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 bg-surface-container/30 p-4 rounded-2xl border border-outline-variant/10">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
-                      <MapPin size={20} />
-                    </div>
-                    <div>
-                      <p className="text-xs text-secondary font-medium mb-0.5">
-                        Return
-                      </p>
-                      <p className="text-sm font-bold text-on-surface">
-                        {dropoffLocation || "Same location"}
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>

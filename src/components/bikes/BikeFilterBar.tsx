@@ -6,8 +6,6 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BikeFilterBarProps {
-  city: string;
-  setCity: (v: string) => void;
   type: string;
   setType: (v: string) => void;
   brand: string;
@@ -21,8 +19,6 @@ interface BikeFilterBarProps {
 }
 
 export default function BikeFilterBar({
-  city,
-  setCity,
   type,
   setType,
   brand,
@@ -34,36 +30,11 @@ export default function BikeFilterBar({
   priceRange,
   setPriceRange,
 }: BikeFilterBarProps) {
-  const cities = ["All Cities", "Ho Chi Minh", "Hanoi", "Da Nang"];
   const types = ["Select Types", "Motorcycle", "Scooter", "Electric"];
   const brands = ["Any Brand", "Honda", "Yamaha", "Suzuki", "Piaggio"];
 
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-outline-variant/10 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-end gap-6 md:gap-8">
-      {/* City */}
-      <div className="w-full lg:flex-1 min-w-60 space-y-3">
-        <label className="text-[11px] uppercase font-bold text-secondary tracking-widest ml-1">
-          Location
-        </label>
-        <div className="relative">
-          <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full appearance-none bg-surface-container/30 border border-outline-variant/20 rounded-2xl py-4 px-5 pr-12 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all hover:bg-surface-container/50"
-          >
-            {cities.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={18}
-            className="absolute right-5 top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
-          />
-        </div>
-      </div>
-
       {/* Category */}
       <div className="w-full lg:flex-1 min-w-60 space-y-3">
         <label className="text-[11px] uppercase font-bold text-secondary tracking-widest ml-1">

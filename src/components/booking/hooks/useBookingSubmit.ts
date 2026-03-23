@@ -17,10 +17,8 @@ interface UseBookingSubmitParams {
   customerInfo: Record<string, string>;
   startDate: string;
   endDate: string;
-  pickupLocation: string;
-  dropoffLocation: string;
-  selectedAddons: string[];
-  paymentMethod: string;
+  sourceApp: string;
+  note: string;
 }
 
 /**
@@ -43,10 +41,8 @@ export function useBookingSubmit() {
           params.customerInfo,
           params.startDate,
           params.endDate,
-          params.pickupLocation,
-          params.dropoffLocation,
-          params.selectedAddons,
-          params.paymentMethod,
+          params.sourceApp,
+          params.note,
         );
 
         const response = await createBookingAction(bookingData);

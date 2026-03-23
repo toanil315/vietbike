@@ -7,6 +7,17 @@
 
 ---
 
+## Booking Integration Update (March 2026)
+
+- Public and admin booking creation are now unified to `POST /bookings`.
+- Public booking form submits manual-form compatible payload:
+  - `customerName`, `customerPhone`, `sourceApp`, `licensePlate`
+  - `startDate`, `rentalDays`, `totalAmount`, `depositAmount`
+  - optional `note`, `documents[]`, `voucherCode`
+- Public booking UI was refreshed to align with manual booking flow and keep payload parity with backend.
+
+---
+
 ## 1. ARCHITECTURAL OVERVIEW
 
 ### 1.1 Technology Stack

@@ -1,14 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  MapPin,
-  Calendar,
-  ChevronRight,
-  Shield,
-  Clock,
-  Info,
-} from "lucide-react";
+import { Calendar, ChevronRight, Shield, Clock, Info } from "lucide-react";
 import { useBookingStore } from "@/store/bookingStore";
 import { formatPrice } from "@/lib/utils";
 import { Vehicle } from "@/types";
@@ -43,17 +36,6 @@ export default function BookingCard({ bike }: { bike: Vehicle }) {
         </div>
 
         <div className="space-y-4 mb-8">
-          <div className="p-4 rounded-2xl bg-surface-container/50 border border-outline-variant/10 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
-              <MapPin size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-secondary uppercase tracking-wider">
-                Pickup Location
-              </p>
-              <p className="text-sm font-bold text-on-surface">Da Nang City</p>
-            </div>
-          </div>
           <div className="p-4 rounded-2xl bg-surface-container/50 border border-outline-variant/10 flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
               <Calendar size={20} />

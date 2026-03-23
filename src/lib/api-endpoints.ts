@@ -39,23 +39,22 @@ export const vehicleEndpoints = {
 
 export const bookingEndpoints = {
   /**
-   * POST /public/bookings
-   * Create a new booking with customer info, dates, vehicle, addons
+   * POST /bookings
+   * Create a booking from unified booking flow
    */
-  create: () => "/public/bookings",
+  create: () => "/bookings",
 
   /**
-   * GET /public/bookings/:reference
+   * GET /bookings/:reference
    * Fetch booking details by reference number
    */
-  getByReference: (reference: string) => `/public/bookings/${reference}`,
+  getByReference: (reference: string) => `/bookings/${reference}`,
 
   /**
-   * GET /public/bookings/my-bookings/:customerId
-   * Fetch bookings for a customer id with pagination query
+   * GET /bookings
+   * Fetch booking list with pagination
    */
-  myBookings: (customerId: string) =>
-    `/public/bookings/my-bookings/${customerId}`,
+  list: () => "/bookings",
 };
 
 // ============================================================================
@@ -197,22 +196,28 @@ export const adminVehicleEndpoints = {
 
 export const adminBookingEndpoints = {
   /**
-   * GET /admin/bookings
+   * GET /bookings
    * List all bookings with filters
    */
-  list: () => "/admin/bookings",
+  list: () => "/bookings",
 
   /**
-   * GET /admin/bookings/:reference
+   * POST /bookings
+   * Create manual booking
+   */
+  create: () => "/bookings",
+
+  /**
+   * GET /bookings/:reference
    * Get booking details by reference
    */
-  detail: (reference: string) => `/admin/bookings/${reference}`,
+  detail: (reference: string) => `/bookings/${reference}`,
 
   /**
-   * PATCH /admin/bookings/:id/status
+   * PATCH /bookings/:id/status
    * Update booking status
    */
-  updateStatus: (id: string) => `/admin/bookings/${id}/status`,
+  updateStatus: (id: string) => `/bookings/${id}/status`,
 };
 
 // ============================================================================

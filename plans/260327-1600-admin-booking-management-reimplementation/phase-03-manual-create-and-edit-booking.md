@@ -3,10 +3,10 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 6h
 
-Rebuild manual create form and add edit booking flow with request bodies matching booking create/update APIs.
+Rebuilt manual create form and added edit booking flow with request bodies matching booking create/update APIs.
 
 ## Context Links
 
@@ -41,7 +41,7 @@ Upsert pattern:
 Routes:
 
 - /admin/bookings/new -> create mode
-- /admin/bookings/[bookingId]/edit -> edit mode
+- /admin/bookings/[reference]/edit -> edit mode
 
 ## Related Code Files
 
@@ -52,7 +52,7 @@ Modify:
 
 Create:
 
-- /Users/dangcongtoan/Desktop/codes/vietbike/FE/src/app/admin/bookings/[bookingId]/edit/page.tsx
+- /Users/dangcongtoan/Desktop/codes/vietbike/FE/src/app/admin/bookings/[reference]/edit/page.tsx
 - /Users/dangcongtoan/Desktop/codes/vietbike/FE/src/components/admin/bookings/booking-upsert-form.tsx
 - /Users/dangcongtoan/Desktop/codes/vietbike/FE/src/components/admin/bookings/booking-form-fields.tsx
 - /Users/dangcongtoan/Desktop/codes/vietbike/FE/src/components/admin/bookings/booking-documents-input.tsx
@@ -61,7 +61,7 @@ Create:
 
 ## Implementation Steps
 
-1. Define form model exactly on API fields:
+1. Defined form model exactly on API fields:
 
 - customerName
 - customerPhone
@@ -74,30 +74,30 @@ Create:
 - note
 - documents[] { name, mimeType, sizeBytes }
 
-2. Implement create submit path:
+2. Implemented create submit path:
 
 - Validate with zod schema.
 - Convert date to ISO string only once in handler utility.
 
-3. Implement edit flow:
+3. Implemented edit flow:
 
-- Prefill data from detail or list item snapshot.
+- Prefill data from booking detail by reference.
 - Submit PATCH /bookings/{bookingId} with allowed editable fields.
 
-4. Remove non-API drift fields from old form (extension, local-only derived fields unless mapped).
+4. Removed non-API drift fields from old form.
 
-5. Preserve UX quality:
+5. Preserved UX quality:
 
 - disable submit while pending
 - field-level + banner errors
-- redirect and success toast/feedback on success
+- redirect and refresh on success
 
 ## Todo List
 
-- [ ] Replace old NewBookingForm model with API-first field schema
-- [ ] Add booking edit route and page
-- [ ] Implement shared create/update mutation hook
-- [ ] Move payload transforms to dedicated handler module
+- [x] Replace old NewBookingForm model with API-first field schema
+- [x] Add booking edit route and page
+- [x] Implement shared create/update mutation hook
+- [x] Move payload transforms to dedicated handler module
 
 ## Success Criteria
 
@@ -117,4 +117,4 @@ Create:
 
 ## Next Steps
 
-- Integrate list/detail actions for edit navigation after phase 2 merge.
+- Integrated list/detail actions for edit navigation.

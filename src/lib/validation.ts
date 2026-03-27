@@ -194,6 +194,60 @@ export const vehicleCreateSchema = z.object({
 
 export type VehicleCreateInput = z.infer<typeof vehicleCreateSchema>;
 
+export const bookingDocumentSchema = z.object({
+  name: z.string().trim().min(1).max(255),
+  url: z.string().url().optional(),
+  mimeType: z.string().max(100).optional(),
+  sizeBytes: z.number().int().min(0).optional(),
+});
+
+export const adminCreateBookingSchema = z.object({
+  customerName: z.string().trim().min(2).max(255),
+  customerPhone: z.string().trim().min(6).max(50),
+  sourceApp: z.string().trim().min(1).max(100).optional(),
+  licensePlate: z.string().trim().min(3).max(30),
+  startDate: z.string().datetime({ offset: true }),
+  rentalDays: z.number().int().min(1).max(365),
+  totalAmount: z.string().trim().min(1).max(100),
+  depositAmount: z.string().trim().min(1).max(100).optional(),
+  extensionInfo: z.string().max(2000).optional(),
+  note: z.string().max(5000).optional(),
+  documents: z.array(bookingDocumentSchema).optional().default([]),
+});
+
+export type AdminCreateBookingInput = z.infer<typeof adminCreateBookingSchema>;
+
+export const adminUpdateBookingSchema = z.object({
+  licensePlate: z.string().trim().min(3).max(30).optional(),
+  pickupDate: z.string().datetime({ offset: true }).optional(),
+  dropoffDate: z.string().datetime({ offset: true }).optional(),
+  totalAmount: z.string().trim().min(1).max(100).optional(),
+  depositAmount: z.string().trim().min(1).max(100).optional(),
+  customerSnapshot: z
+    .object({
+      fullName: z.string().trim().min(1).max(255).optional(),
+      email: z.string().trim().email().max(255).optional(),
+      phone: z.string().trim().min(6).max(50).optional(),
+      nationality: z.string().trim().max(100).optional(),
+      licenseNumber: z.string().trim().max(100).optional(),
+    })
+    .optional(),
+  sourceApp: z.string().trim().min(1).max(100).optional(),
+  extensionInfo: z.string().max(2000).optional(),
+  note: z.string().max(5000).optional(),
+  documents: z.array(bookingDocumentSchema).optional(),
+  currency: z.string().trim().min(1).max(10).optional(),
+});
+
+export type AdminUpdateBookingInput = z.infer<typeof adminUpdateBookingSchema>;
+
+export const bookingSyncTargetSchema = z.object({
+  spreadsheetId: z.string().trim().min(1).max(255),
+  sheetName: z.string().trim().min(1).max(255).optional().default("Sheet1"),
+});
+
+export type BookingSyncTargetInput = z.infer<typeof bookingSyncTargetSchema>;
+
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================

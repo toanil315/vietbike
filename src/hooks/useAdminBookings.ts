@@ -8,7 +8,7 @@
 import { useState, useEffect, useCallback } from "react";
 import apiClient from "@/lib/api";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
-import { Booking } from "@/types";
+import { Booking, BookingListQuery, Pagination } from "@/types";
 import { handleApiError, AppError } from "@/lib/error-handler";
 
 /**
@@ -17,18 +17,14 @@ import { handleApiError, AppError } from "@/lib/error-handler";
 export function useAdminBookings(
   page: number = 1,
   pageSize: number = 20,
-  filters?: {
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-  },
+  filters?: BookingListQuery,
 ) {
   const [data, setData] = useState<Booking[]>([]);
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<Pagination>({
     total: 0,
     page: 1,
-    limit: 20,
-    pages: 1,
+    pageSize: 20,
+    totalPages: 1,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<AppError | null>(null);
@@ -43,15 +39,24 @@ export function useAdminBookings(
           page: page.toString(),
           pageSize: pageSize.toString(),
           ...(filters?.status && { status: filters.status }),
+          ...(filters?.customerName && { customerName: filters.customerName }),
+          ...(filters?.customerPhone && {
+            customerPhone: filters.customerPhone,
+          }),
+          ...(filters?.licensePlate && { licensePlate: filters.licensePlate }),
+          ...(filters?.startDate && { startDate: filters.startDate }),
+          ...(filters?.endDate && { endDate: filters.endDate }),
+          ...(filters?.sortBy && { sortBy: filters.sortBy }),
+          ...(filters?.sortOrder && { sortOrder: filters.sortOrder }),
         });
 
         const endpoint = `${adminBookingEndpoints.list()}?${params.toString()}`;
         const response = await apiClient.get<{
-          bookings: Booking[];
-          pagination: typeof pagination;
+          data: Booking[];
+          pagination: Pagination;
         }>(endpoint);
 
-        setData(response.bookings || []);
+        setData(response.data || []);
         setPagination(response.pagination);
       } catch (err) {
         const appError = handleApiError(err);

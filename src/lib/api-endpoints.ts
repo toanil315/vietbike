@@ -218,6 +218,36 @@ export const adminBookingEndpoints = {
    * Update booking status
    */
   updateStatus: (id: string) => `/bookings/${id}/status`,
+
+  /**
+   * PATCH /bookings/:id
+   * Update mutable booking fields
+   */
+  update: (id: string) => `/bookings/${id}`,
+
+  /**
+   * GET /bookings/sync/spreadsheets
+   * List available spreadsheet targets
+   */
+  syncSpreadsheets: () => "/bookings/sync/spreadsheets",
+
+  /**
+   * GET /bookings/sync/target
+   * Get active sync target
+   */
+  syncTarget: () => "/bookings/sync/target",
+
+  /**
+   * PUT /bookings/sync/target
+   * Set active sync target
+   */
+  setSyncTarget: () => "/bookings/sync/target",
+
+  /**
+   * POST /bookings/sync/pull
+   * Pull changes from active sync target
+   */
+  syncPull: () => "/bookings/sync/pull",
 };
 
 // ============================================================================

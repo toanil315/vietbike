@@ -1,7 +1,7 @@
 ---
 title: "Admin Booking Management Re-implementation Plan"
 description: "Rebuild admin booking management UI and data layer to fully match backend booking and sync APIs from Swagger/Postman."
-status: pending
+status: completed
 priority: P1
 effort: 22h
 issue: null
@@ -27,13 +27,13 @@ Rationale:
 
 ## Phase Map
 
-| #   | Phase                                     | Status  | Effort | File                                                                                                                     |
-| --- | ----------------------------------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Contract alignment and foundation         | Pending | 4h     | [phase-01](./phase-01-contract-alignment-and-foundation.md)                                                              |
-| 2   | Booking list + detail rebuild             | Pending | 5h     | [phase-02-booking-list-and-detail-rebuild.md](./phase-02-booking-list-and-detail-rebuild.md)                             |
-| 3   | Manual create + edit booking flow         | Pending | 6h     | [phase-03-manual-create-and-edit-booking.md](./phase-03-manual-create-and-edit-booking.md)                               |
-| 4   | Sync target UI + pull orchestration       | Pending | 4h     | [phase-04-sync-target-management-and-pull-orchestration.md](./phase-04-sync-target-management-and-pull-orchestration.md) |
-| 5   | Type safety, regression hardening, polish | Pending | 3h     | [phase-05-validation-type-safety-and-hardening.md](./phase-05-validation-type-safety-and-hardening.md)                   |
+| #   | Phase                                     | Status    | Effort | File                                                                                                                     |
+| --- | ----------------------------------------- | --------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Contract alignment and foundation         | Completed | 4h     | [phase-01](./phase-01-contract-alignment-and-foundation.md)                                                              |
+| 2   | Booking list + detail rebuild             | Completed | 5h     | [phase-02-booking-list-and-detail-rebuild.md](./phase-02-booking-list-and-detail-rebuild.md)                             |
+| 3   | Manual create + edit booking flow         | Completed | 6h     | [phase-03-manual-create-and-edit-booking.md](./phase-03-manual-create-and-edit-booking.md)                               |
+| 4   | Sync target UI + pull orchestration       | Completed | 4h     | [phase-04-sync-target-management-and-pull-orchestration.md](./phase-04-sync-target-management-and-pull-orchestration.md) |
+| 5   | Type safety, regression hardening, polish | Completed | 3h     | [phase-05-validation-type-safety-and-hardening.md](./phase-05-validation-type-safety-and-hardening.md)                   |
 
 ## Parallel Execution Strategy
 
@@ -60,7 +60,7 @@ Phase 2 ownership:
 
 - src/app/admin/bookings/page.tsx
 - src/app/admin/bookings/[reference]/page.tsx (new)
-- src/components/admin/bookings/bookings-list-page.tsx (new)
+- src/components/admin/bookings/bookings-management-page.tsx (new)
 - src/components/admin/bookings/bookings-list-filters.tsx (new)
 - src/components/admin/bookings/bookings-table.tsx (new)
 - src/components/admin/bookings/booking-detail-card.tsx (new)
@@ -70,7 +70,7 @@ Phase 2 ownership:
 Phase 3 ownership:
 
 - src/app/admin/bookings/new/page.tsx
-- src/app/admin/bookings/[bookingId]/edit/page.tsx (new)
+- src/app/admin/bookings/[reference]/edit/page.tsx (new)
 - src/components/admin/NewBookingForm.tsx (replace/split)
 - src/components/admin/bookings/booking-upsert-form.tsx (new)
 - src/components/admin/bookings/booking-form-fields.tsx (new)

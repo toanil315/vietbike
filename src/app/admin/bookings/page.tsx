@@ -1,20 +1,13 @@
-import BookingsTable from "@/components/admin/BookingsTable";
+import BookingsManagementPage from "@/components/admin/bookings/bookings-management-page";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
-import { Booking } from "@/types";
+import { Booking, BookingListResponse } from "@/types";
+import { BookingListFilters } from "@/components/admin/bookings/bookings-list-filters";
 
 interface AdminBookingsPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-interface BookingsResponse {
-  data: Booking[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
-}
+type BookingsResponse = BookingListResponse;
 
 async function fetchBookings(
   query: URLSearchParams,
@@ -66,21 +59,36 @@ export default async function AdminBookingsPage({
   const page = Number(params?.page || 1);
   const pageSize = Number(params?.pageSize || 20);
   const status = typeof params?.status === "string" ? params.status : "";
-  const search = typeof params?.search === "string" ? params.search : "";
+  const customerName =
+    typeof params?.customerName === "string" ? params.customerName : "";
+  const customerPhone =
+    typeof params?.customerPhone === "string" ? params.customerPhone : "";
+  const licensePlate =
+    typeof params?.licensePlate === "string" ? params.licensePlate : "";
 
   const query = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
     ...(status ? { status } : {}),
+    ...(customerName ? { customerName } : {}),
+    ...(customerPhone ? { customerPhone } : {}),
+    ...(licensePlate ? { licensePlate } : {}),
   });
 
   const bookingsData = await fetchBookings(query);
 
+  const initialFilters: BookingListFilters = {
+    status,
+    customerName,
+    customerPhone,
+    licensePlate,
+  };
+
   return (
-    <BookingsTable
+    <BookingsManagementPage
       initialBookings={bookingsData.data}
       initialPagination={bookingsData.pagination}
-      initialFilters={{ search, status }}
+      initialFilters={initialFilters}
     />
   );
 }

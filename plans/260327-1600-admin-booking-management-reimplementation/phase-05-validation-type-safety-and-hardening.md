@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 3h
 
 Consolidate type safety, fix feature-introduced errors, and harden loading/error/empty states after parallel phase merge.
@@ -49,10 +49,10 @@ Optional docs update:
 
 ## Todo List
 
-- [ ] Resolve all TS errors introduced by booking refactor
-- [ ] Verify complete admin booking user journeys
-- [ ] Remove dead code from replaced booking modules
-- [ ] Update docs if architecture changed materially
+- [x] Resolve all TS errors introduced by booking refactor
+- [x] Verify complete admin booking user journeys
+- [x] Remove dead code from replaced booking modules
+- [x] Update docs if architecture changed materially (no change required after verification)
 
 ## Success Criteria
 

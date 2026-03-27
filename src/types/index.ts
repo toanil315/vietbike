@@ -87,22 +87,135 @@ export interface BookingAddon {
 export interface Booking {
   id: string;
   reference: string;
-  vehicleId: string;
+  vehicleId?: string;
+  licensePlate?: string;
   pickupDate: string;
   dropoffDate: string;
   status: BookingStatus;
-  totalAmount: number;
+  totalAmount: string | number;
+  depositAmount?: string | number;
+  rentalDays?: number;
+  sourceApp?: string;
+  note?: string;
+  extensionInfo?: string;
+  documents?: BookingDocument[];
   customerInfo: {
     fullName: string;
-    email: string;
+    email?: string;
     phone: string;
     nationality?: string;
     licenseNumber?: string;
   };
+  customerSnapshot?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    nationality?: string;
+    licenseNumber?: string;
+  };
   voucherCode?: string;
-  voucherDiscount: number;
+  voucherDiscount?: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BookingDocument {
+  name: string;
+  url?: string;
+  mimeType?: string;
+  sizeBytes?: number;
+}
+
+export interface BookingListQuery {
+  page?: number;
+  pageSize?: number;
+  status?: string;
+  licensePlate?: string;
+  customerName?: string;
+  customerPhone?: string;
+  startDate?: string;
+  endDate?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+export interface BookingListResponse {
+  data: Booking[];
+  pagination: Pagination;
+}
+
+export interface CreateBookingPayload {
+  customerName: string;
+  customerPhone: string;
+  sourceApp?: string;
+  licensePlate: string;
+  startDate: string;
+  rentalDays: number;
+  totalAmount: string;
+  depositAmount?: string;
+  note?: string;
+  extensionInfo?: string;
+  documents?: BookingDocument[];
+}
+
+export interface UpdateBookingPayload {
+  licensePlate?: string;
+  pickupDate?: string;
+  dropoffDate?: string;
+  totalAmount?: string;
+  depositAmount?: string;
+  customerSnapshot?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    nationality?: string;
+    licenseNumber?: string;
+  };
+  sourceApp?: string;
+  extensionInfo?: string;
+  note?: string;
+  documents?: BookingDocument[];
+  currency?: string;
+}
+
+export interface SyncSpreadsheetItem {
+  id: string;
+  name: string;
+  modifiedTime?: string;
+}
+
+export interface SyncSpreadsheetListResponse {
+  data: SyncSpreadsheetItem[];
+  pagination: Pagination;
+}
+
+export interface SyncTarget {
+  id: string;
+  spreadsheetId: string;
+  sheetName: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SetSyncTargetPayload {
+  spreadsheetId: string;
+  sheetName?: string;
+}
+
+export interface PullBookingSyncPayload {
+  batchSize?: number;
+}
+
+export interface PullBookingSyncResult {
+  spreadsheetId: string;
+  sheetName: string;
+  processed: number;
+  updated: number;
+  skipped: number;
+  conflicts: number;
+  failed: number;
+  conflictReasons: string[];
 }
 
 export interface Customer {

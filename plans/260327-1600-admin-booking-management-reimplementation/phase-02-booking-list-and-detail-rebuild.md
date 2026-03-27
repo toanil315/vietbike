@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 5h
 
 Rebuild booking list/search/detail UI with backend-driven query semantics and modular component boundaries.
@@ -86,10 +86,10 @@ Delete or deprecate:
 
 ## Todo List
 
-- [ ] Replace local search behavior with API query semantics
-- [ ] Split booking list UI into focused components
-- [ ] Implement booking detail route by reference
-- [ ] Keep status update flow in modular handlers/actions
+- [x] Replace local search behavior with API query semantics
+- [x] Split booking list UI into focused components
+- [x] Implement booking detail route by reference
+- [x] Keep status update flow in modular handlers/actions
 
 ## Success Criteria
 

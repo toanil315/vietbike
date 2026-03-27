@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Add booking sync target management UI into booking management page and enforce pull trigger policy for fresh data sync.
@@ -81,10 +81,10 @@ Create:
 
 ## Todo List
 
-- [ ] Implement sync target hook with guarded first-load pull
-- [ ] Implement sync target presentational section in booking management page
-- [ ] Trigger pull after every successful target change
-- [ ] Add failure recovery UI and retry action
+- [x] Implement sync target hook with guarded first-load pull
+- [x] Implement sync target presentational section in booking management page
+- [x] Trigger pull after every successful target change
+- [x] Add failure recovery UI and retry action
 
 ## Success Criteria
 

@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Normalize endpoint builders, domain types, and validation schemas against live Swagger + postman_collection.json before any UI rewrite.
@@ -85,10 +85,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Update endpoint constants for full booking + sync APIs
-- [ ] Add booking/sync DTOs to shared types
-- [ ] Add create/update booking zod schemas
-- [ ] Add low-risk mapping utilities for money/date field compatibility
+- [x] Update endpoint constants for full booking + sync APIs
+- [x] Add booking/sync DTOs to shared types
+- [x] Add create/update booking zod schemas
+- [x] Add low-risk mapping utilities for money/date field compatibility
 
 ## Success Criteria
 

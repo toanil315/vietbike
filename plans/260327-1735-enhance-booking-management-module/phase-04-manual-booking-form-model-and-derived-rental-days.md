@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 6h
 
 Upgrade create/edit booking forms with explicit labels, extension info field handling, document link form-array UX, and rental-day derivation from pickup/dropoff dates.
@@ -71,11 +71,11 @@ Modify:
 
 ## Todo List
 
-- [ ] Add explicit labels for all create/edit form inputs
-- [ ] Keep extensionInfo visible and payload-mapped in both modes
-- [ ] Convert documents to link-oriented form array
-- [ ] Derive rental days from pickup/dropoff for create/edit
-- [ ] Translate form text/messages to Vietnamese
+- [x] Add explicit labels for all create/edit form inputs
+- [x] Keep extensionInfo visible and payload-mapped in both modes
+- [x] Convert documents to link-oriented form array
+- [x] Derive rental days from pickup/dropoff for create/edit
+- [x] Translate form text/messages to Vietnamese
 
 ## Success Criteria
 

@@ -119,7 +119,7 @@ export default function AdminDashboardContent({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-2xl p-5 bg-surface-container/40 border border-outline-variant/10">
               <p className="text-xs text-secondary uppercase tracking-wider">
-                Pending
+                Cho xac nhan
               </p>
               <p className="text-2xl font-bold mt-2">
                 {
@@ -130,13 +130,13 @@ export default function AdminDashboardContent({
             </div>
             <div className="rounded-2xl p-5 bg-surface-container/40 border border-outline-variant/10">
               <p className="text-xs text-secondary uppercase tracking-wider">
-                Confirmed or Active
+                Da xac nhan hoac dang thue
               </p>
               <p className="text-2xl font-bold mt-2">{activeBookings}</p>
             </div>
             <div className="rounded-2xl p-5 bg-surface-container/40 border border-outline-variant/10">
               <p className="text-xs text-secondary uppercase tracking-wider">
-                Completed
+                Hoan thanh
               </p>
               <p className="text-2xl font-bold mt-2">
                 {

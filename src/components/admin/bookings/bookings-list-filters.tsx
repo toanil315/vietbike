@@ -36,19 +36,19 @@ export default function BookingsListFilters({
         <input
           value={value.customerName}
           onChange={(event) => onChange({ customerName: event.target.value })}
-          placeholder="Customer name"
+          placeholder="Tên khách hàng"
           className="rounded-xl border border-outline-variant/20 bg-surface-container/30 px-4 py-3 text-sm"
         />
         <input
           value={value.customerPhone}
           onChange={(event) => onChange({ customerPhone: event.target.value })}
-          placeholder="Customer phone"
+          placeholder="Số điện thoại"
           className="rounded-xl border border-outline-variant/20 bg-surface-container/30 px-4 py-3 text-sm"
         />
         <input
           value={value.licensePlate}
           onChange={(event) => onChange({ licensePlate: event.target.value })}
-          placeholder="License plate"
+          placeholder="Biển số"
           className="rounded-xl border border-outline-variant/20 bg-surface-container/30 px-4 py-3 text-sm"
         />
         <select
@@ -56,7 +56,7 @@ export default function BookingsListFilters({
           onChange={(event) => onChange({ status: event.target.value })}
           className="rounded-xl border border-outline-variant/20 bg-surface-container/30 px-4 py-3 text-sm"
         >
-          <option value="">All statuses</option>
+          <option value="">Tất cả trạng thái</option>
           <option value="pending">pending</option>
           <option value="confirmed">confirmed</option>
           <option value="active">active</option>
@@ -67,16 +67,16 @@ export default function BookingsListFilters({
       <div className="mt-4 flex items-center gap-2">
         <button
           type="submit"
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-primary/30 active:scale-[0.98]"
         >
-          Apply
+          Áp dụng
         </button>
         <button
           type="button"
           onClick={onReset}
-          className="rounded-lg border border-outline-variant/20 px-4 py-2 text-sm font-bold text-secondary"
+          className="rounded-lg border border-outline-variant/20 px-4 py-2 text-sm font-bold text-secondary transition hover:bg-surface-container/30 focus:outline-none focus:ring-2 focus:ring-primary/20 active:scale-[0.98]"
         >
-          Reset
+          Đặt lại
         </button>
       </div>
     </form>

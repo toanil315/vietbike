@@ -45,13 +45,13 @@ export default async function BookingDetailPage({
     return (
       <div className="space-y-4 rounded-3xl border border-outline-variant/10 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-on-surface">
-          Booking Not Found
+          Không tìm thấy booking
         </h1>
         <p className="text-sm text-secondary">
-          No booking found for reference {reference}.
+          Không có booking với mã {reference}.
         </p>
         <Link href="/admin/bookings" className="text-sm font-bold text-primary">
-          Back to booking management
+          Quay lại quản lý booking
         </Link>
       </div>
     );

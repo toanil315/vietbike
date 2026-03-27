@@ -1,7 +1,7 @@
 ---
 title: "Enhance Booking Management Module"
 description: "Improve admin booking interactions, sync-target usability, list columns, manual upsert forms, and Vietnamese localization across admin panel."
-status: pending
+status: in-progress
 priority: P1
 effort: 24h
 issue: null
@@ -28,14 +28,14 @@ Rationale:
 
 ## Phase Map
 
-| #   | Phase                                             | Status  | Effort | File                                                                                                                             |
-| --- | ------------------------------------------------- | ------- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Interaction standards and labeling baseline       | Pending | 3h     | [phase-01-interaction-standards-and-shared-admin-labels.md](./phase-01-interaction-standards-and-shared-admin-labels.md)         |
-| 2   | Sync target usability and pull retrigger          | Pending | 4h     | [phase-02-sync-target-usability-and-pull-retrigger.md](./phase-02-sync-target-usability-and-pull-retrigger.md)                   |
-| 3   | Booking list financial columns and actions UX     | Pending | 4h     | [phase-03-booking-list-financial-columns-and-actions.md](./phase-03-booking-list-financial-columns-and-actions.md)               |
-| 4   | Manual booking form model and derived rental days | Pending | 6h     | [phase-04-manual-booking-form-model-and-derived-rental-days.md](./phase-04-manual-booking-form-model-and-derived-rental-days.md) |
-| 5   | Admin panel Vietnamese translation rollout        | Pending | 5h     | [phase-05-admin-panel-vietnamese-translation-rollout.md](./phase-05-admin-panel-vietnamese-translation-rollout.md)               |
-| 6   | Regression hardening and release checklist        | Pending | 2h     | [phase-06-regression-hardening-and-release-checklist.md](./phase-06-regression-hardening-and-release-checklist.md)               |
+| #   | Phase                                             | Status      | Effort | File                                                                                                                             |
+| --- | ------------------------------------------------- | ----------- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Interaction standards and labeling baseline       | In Progress | 3h     | [phase-01-interaction-standards-and-shared-admin-labels.md](./phase-01-interaction-standards-and-shared-admin-labels.md)         |
+| 2   | Sync target usability and pull retrigger          | Completed   | 4h     | [phase-02-sync-target-usability-and-pull-retrigger.md](./phase-02-sync-target-usability-and-pull-retrigger.md)                   |
+| 3   | Booking list financial columns and actions UX     | Completed   | 4h     | [phase-03-booking-list-financial-columns-and-actions.md](./phase-03-booking-list-financial-columns-and-actions.md)               |
+| 4   | Manual booking form model and derived rental days | Completed   | 6h     | [phase-04-manual-booking-form-model-and-derived-rental-days.md](./phase-04-manual-booking-form-model-and-derived-rental-days.md) |
+| 5   | Admin panel Vietnamese translation rollout        | In Progress | 5h     | [phase-05-admin-panel-vietnamese-translation-rollout.md](./phase-05-admin-panel-vietnamese-translation-rollout.md)               |
+| 6   | Regression hardening and release checklist        | In Progress | 2h     | [phase-06-regression-hardening-and-release-checklist.md](./phase-06-regression-hardening-and-release-checklist.md)               |
 
 ## Dependency Graph
 

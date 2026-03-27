@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Improve Booking Sync Target panel usability and behavior: editable current sheet, balanced field sizing, stronger refresh action styling, and guaranteed pull retrigger on target save.
@@ -63,10 +63,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Replace read-only Current Sheet UI with editable field
-- [ ] Add explicit save flow with pull retrigger
-- [ ] Apply primary interactive styling for refresh action
-- [ ] Translate panel labels/messages to Vietnamese
+- [x] Replace read-only Current Sheet UI with editable field
+- [x] Add explicit save flow with pull retrigger
+- [x] Apply primary interactive styling for refresh action
+- [x] Translate panel labels/messages to Vietnamese
 
 ## Success Criteria
 

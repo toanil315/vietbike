@@ -11,8 +11,6 @@ export interface BookingUpsertFormValues {
   customerEmail: string;
   sourceApp: string;
   licensePlate: string;
-  startDate: string;
-  rentalDays: number;
   pickupDate: string;
   dropoffDate: string;
   totalAmount: string;
@@ -23,6 +21,33 @@ export interface BookingUpsertFormValues {
   documents: BookingDocument[];
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export function calculateRentalDays(pickupDate: string, dropoffDate: string) {
+  const pickupMs = new Date(pickupDate).getTime();
+  const dropoffMs = new Date(dropoffDate).getTime();
+
+  if (!Number.isFinite(pickupMs) || !Number.isFinite(dropoffMs)) {
+    return 1;
+  }
+
+  const diff = dropoffMs - pickupMs;
+  if (diff <= 0) {
+    return 1;
+  }
+
+  return Math.max(1, Math.ceil(diff / DAY_MS));
+}
+
+function normalizeDocuments(documents: BookingDocument[]) {
+  return documents
+    .map((document) => ({
+      name: (document.name || "").trim(),
+      url: (document.url || "").trim(),
+    }))
+    .filter((document) => document.name && document.url);
+}
+
 export function getDefaultBookingFormValues(
   booking?: Booking | null,
 ): BookingUpsertFormValues {
@@ -30,16 +55,19 @@ export function getDefaultBookingFormValues(
   const fallbackStart = now.toISOString().slice(0, 16);
 
   if (!booking) {
+    const pickupDate = fallbackStart;
+    const dropoffDate = new Date(Date.now() + DAY_MS)
+      .toISOString()
+      .slice(0, 16);
+
     return {
       customerName: "",
       customerPhone: "",
       customerEmail: "",
       sourceApp: "manual",
       licensePlate: "",
-      startDate: fallbackStart,
-      rentalDays: 1,
-      pickupDate: fallbackStart,
-      dropoffDate: fallbackStart,
+      pickupDate,
+      dropoffDate,
       totalAmount: "",
       depositAmount: "0",
       note: "",
@@ -60,8 +88,6 @@ export function getDefaultBookingFormValues(
       booking.customerInfo?.email || booking.customerSnapshot?.email || "",
     sourceApp: booking.sourceApp || "manual",
     licensePlate: booking.licensePlate || "",
-    startDate: booking.pickupDate?.slice(0, 16) || fallbackStart,
-    rentalDays: booking.rentalDays || 1,
     pickupDate: booking.pickupDate?.slice(0, 16) || fallbackStart,
     dropoffDate: booking.dropoffDate?.slice(0, 16) || fallbackStart,
     totalAmount: String(booking.totalAmount || ""),
@@ -69,25 +95,31 @@ export function getDefaultBookingFormValues(
     note: booking.note || "",
     extensionInfo: booking.extensionInfo || "",
     currency: "VND",
-    documents: booking.documents || [],
+    documents:
+      booking.documents?.map((document) => ({
+        name: document.name || "",
+        url: document.url || "",
+      })) || [],
   };
 }
 
 export function buildCreateBookingPayload(
   values: BookingUpsertFormValues,
 ): CreateBookingPayload {
+  const rentalDays = calculateRentalDays(values.pickupDate, values.dropoffDate);
+
   return {
     customerName: values.customerName.trim(),
     customerPhone: values.customerPhone.trim(),
     sourceApp: values.sourceApp.trim() || "manual",
     licensePlate: values.licensePlate.trim(),
-    startDate: new Date(values.startDate).toISOString(),
-    rentalDays: values.rentalDays,
+    startDate: new Date(values.pickupDate).toISOString(),
+    rentalDays,
     totalAmount: values.totalAmount.trim(),
     depositAmount: values.depositAmount.trim() || "0",
     extensionInfo: values.extensionInfo.trim() || undefined,
     note: values.note.trim() || undefined,
-    documents: values.documents,
+    documents: normalizeDocuments(values.documents),
   };
 }
 
@@ -108,7 +140,7 @@ export function buildUpdateBookingPayload(
     sourceApp: values.sourceApp.trim() || undefined,
     extensionInfo: values.extensionInfo.trim() || undefined,
     note: values.note.trim() || undefined,
-    documents: values.documents,
+    documents: normalizeDocuments(values.documents),
     currency: values.currency.trim() || "VND",
   };
 }

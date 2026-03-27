@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: In Progress  
 Effort: 2h
 
 Run cross-feature hardening for booking/admin changes and complete release readiness checks.
@@ -53,9 +53,9 @@ Modify (only if regression fix needed):
 ## Todo List
 
 - [ ] Complete end-to-end QA checklist for phases 2-5
-- [ ] Run production build and resolve regressions
-- [ ] Confirm no API payload/enum regressions after translation
-- [ ] Mark plan artifacts completed
+- [x] Run production build and resolve regressions
+- [x] Confirm no API payload/enum regressions after translation
+- [x] Mark plan artifacts completed
 
 ## Success Criteria
 

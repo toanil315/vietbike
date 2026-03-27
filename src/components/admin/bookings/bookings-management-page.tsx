@@ -3,13 +3,12 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { updateBookingStatusAction } from "@/app/admin/bookings/actions";
 import BookingsListFilters, {
   BookingListFilters,
 } from "@/components/admin/bookings/bookings-list-filters";
 import BookingsTable from "@/components/admin/bookings/bookings-table";
 import BookingSyncTargetSection from "@/components/admin/bookings/booking-sync-target-section";
-import { Booking, BookingStatus, Pagination } from "@/types";
+import { Booking, Pagination } from "@/types";
 
 interface BookingsManagementPageProps {
   initialBookings: Booking[];
@@ -25,9 +24,6 @@ export default function BookingsManagementPage({
   const router = useRouter();
   const pathname = usePathname();
   const [filters, setFilters] = useState<BookingListFilters>(initialFilters);
-  const [updatingBookingId, setUpdatingBookingId] = useState<string | null>(
-    null,
-  );
 
   const applyQuery = useCallback(
     (next: BookingListFilters, page: number) => {
@@ -43,16 +39,6 @@ export default function BookingsManagementPage({
     [initialPagination.pageSize, pathname, router],
   );
 
-  const handleStatusUpdate = useCallback(
-    async (bookingId: string, status: Exclude<BookingStatus, "pending">) => {
-      setUpdatingBookingId(bookingId);
-      await updateBookingStatusAction(bookingId, status);
-      setUpdatingBookingId(null);
-      router.refresh();
-    },
-    [router],
-  );
-
   const memoizedBookings = useMemo(() => initialBookings, [initialBookings]);
 
   return (
@@ -60,17 +46,17 @@ export default function BookingsManagementPage({
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-3xl font-bold text-on-surface">
-            Booking Management
+            Quản lý booking
           </h1>
           <p className="text-sm text-secondary">
-            Manage booking list, details, manual create/edit, and sync targets.
+            Quản lý danh sách, chi tiết, tạo/sửa thủ công và mục đồng bộ.
           </p>
         </div>
         <Link
           href="/admin/bookings/new"
-          className="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-primary-container"
+          className="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-primary/30 active:scale-[0.98]"
         >
-          Create Booking
+          Tạo booking
         </Link>
       </div>
 
@@ -97,8 +83,6 @@ export default function BookingsManagementPage({
       <BookingsTable
         bookings={memoizedBookings}
         pagination={initialPagination}
-        updatingBookingId={updatingBookingId}
-        onUpdateStatus={handleStatusUpdate}
         onPageChange={(nextPage) => applyQuery(filters, nextPage)}
       />
     </div>

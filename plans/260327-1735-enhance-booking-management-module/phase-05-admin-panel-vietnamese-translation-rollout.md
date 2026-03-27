@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: In Progress  
 Effort: 5h
 
 Translate remaining admin panel English UI copy to Vietnamese while preserving API contracts, enum safety, and operational clarity.
@@ -61,10 +61,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Complete admin translation inventory
-- [ ] Translate all visible admin static text to Vietnamese
+- [x] Complete admin translation inventory
+- [x] Translate all visible admin static text to Vietnamese
 - [ ] Centralize repeated labels to constants map
-- [ ] Verify enum values still unchanged in logic/payloads
+- [x] Verify enum values still unchanged in logic/payloads
 
 ## Success Criteria
 

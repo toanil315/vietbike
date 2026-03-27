@@ -196,7 +196,7 @@ export type VehicleCreateInput = z.infer<typeof vehicleCreateSchema>;
 
 export const bookingDocumentSchema = z.object({
   name: z.string().trim().min(1).max(255),
-  url: z.string().url().optional(),
+  url: z.string().trim().url(),
   mimeType: z.string().max(100).optional(),
   sizeBytes: z.number().int().min(0).optional(),
 });

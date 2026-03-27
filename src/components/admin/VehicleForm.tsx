@@ -135,7 +135,9 @@ export default function VehicleForm() {
           })),
         );
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Cannot load vehicle");
+        setError(
+          err instanceof Error ? err.message : "Khong the tai du lieu xe",
+        );
       } finally {
         setIsLoadingVehicle(false);
       }
@@ -180,10 +182,10 @@ export default function VehicleForm() {
       if (isEdit && vehicleId) {
         const updated = await updateVehicleAction(vehicleId, baseUpdatePayload);
         if (!updated.ok) {
-          throw new Error(updated.error || "Failed to update vehicle");
+          throw new Error(updated.error || "Cap nhat xe that bai");
         }
 
-        setSuccess("Vehicle updated successfully.");
+        setSuccess("Cap nhat xe thanh cong.");
       } else {
         const created = await createVehicleAction({
           ...baseUpdatePayload,
@@ -207,14 +209,14 @@ export default function VehicleForm() {
         });
 
         if (!created.ok) {
-          throw new Error(created.error || "Failed to create vehicle");
+          throw new Error(created.error || "Tao xe moi that bai");
         }
 
         router.push("/admin/vehicles");
         return;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit form");
+      setError(err instanceof Error ? err.message : "Gui form that bai");
     } finally {
       setIsSubmitting(false);
     }
@@ -233,11 +235,11 @@ export default function VehicleForm() {
     setIsUpdatingStatus(false);
 
     if (!result.ok) {
-      setError(result.error || "Failed to update status");
+      setError(result.error || "Cap nhat trang thai that bai");
       return;
     }
 
-    setSuccess("Vehicle status updated.");
+    setSuccess("Da cap nhat trang thai xe.");
   };
 
   const handleAddImage = async () => {
@@ -260,7 +262,7 @@ export default function VehicleForm() {
     });
 
     if (!result.ok) {
-      setError(result.error || "Cannot add image");
+      setError(result.error || "Khong the them anh");
       return;
     }
 
@@ -279,7 +281,7 @@ export default function VehicleForm() {
 
     const result = await deleteVehicleImageAction(vehicleId, image.id);
     if (!result.ok) {
-      setError(result.error || "Cannot delete image");
+      setError(result.error || "Khong the xoa anh");
       return;
     }
 
@@ -303,7 +305,7 @@ export default function VehicleForm() {
     });
 
     if (!result.ok) {
-      setError(result.error || "Cannot add feature");
+      setError(result.error || "Khong the them tinh nang");
       return;
     }
 
@@ -326,7 +328,7 @@ export default function VehicleForm() {
 
     const result = await deleteVehicleFeatureAction(vehicleId, feature.id);
     if (!result.ok) {
-      setError(result.error || "Cannot delete feature");
+      setError(result.error || "Khong the xoa tinh nang");
       return;
     }
 
@@ -337,7 +339,7 @@ export default function VehicleForm() {
     return (
       <div className="max-w-4xl mx-auto py-20 flex items-center justify-center gap-3 text-secondary">
         <Loader2 className="animate-spin" size={20} />
-        <span>Loading vehicle...</span>
+        <span>Dang tai du lieu xe...</span>
       </div>
     );
   }
@@ -355,12 +357,12 @@ export default function VehicleForm() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-on-surface">
-              {isEdit ? "Edit Vehicle" : "Create Vehicle"}
+              {isEdit ? "Chinh sua xe" : "Tao xe moi"}
             </h1>
             <p className="text-secondary text-sm">
               {isEdit
-                ? "Update vehicle information and media"
-                : "Create a new vehicle using backend contract fields"}
+                ? "Cap nhat thong tin xe va du lieu media"
+                : "Tao xe moi theo contract backend"}
             </p>
           </div>
         </div>
@@ -370,7 +372,7 @@ export default function VehicleForm() {
             href="/admin/vehicles"
             className="px-5 py-2.5 rounded-xl border border-outline-variant/20 text-sm font-bold text-secondary hover:bg-surface-container transition-default"
           >
-            Cancel
+            Huy
           </Link>
           <button
             type="submit"
@@ -383,7 +385,7 @@ export default function VehicleForm() {
             ) : (
               <Save size={16} />
             )}
-            {isEdit ? "Save Changes" : "Create Vehicle"}
+            {isEdit ? "Luu thay doi" : "Tao xe"}
           </button>
         </div>
       </div>
@@ -402,7 +404,7 @@ export default function VehicleForm() {
       <form id="vehicle-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Name
+            Ten xe
             <input
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.name}
@@ -424,7 +426,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Brand
+            Hang xe
             <input
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.brand}
@@ -435,7 +437,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Model
+            Dong xe
             <input
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.model}
@@ -446,7 +448,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Year
+            Nam san xuat
             <input
               type="number"
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
@@ -461,7 +463,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            License Plate
+            Bien so
             <input
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.licensePlate}
@@ -475,7 +477,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Price Per Day (VND)
+            Gia thue / ngay (VND)
             <input
               type="number"
               min={1}
@@ -491,7 +493,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Available Seats
+            So cho ngoi
             <input
               type="number"
               min={1}
@@ -507,7 +509,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Fuel Type
+            Loai nhien lieu
             <input
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.fuelType}
@@ -518,7 +520,7 @@ export default function VehicleForm() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Transmission
+            Hop so
             <select
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.transmission}
@@ -538,7 +540,7 @@ export default function VehicleForm() {
             </select>
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Type
+            Loai xe
             <select
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.type}
@@ -558,7 +560,7 @@ export default function VehicleForm() {
             </select>
           </label>
           <label className="space-y-2 text-sm font-medium text-secondary">
-            Category
+            Phan khuc
             <select
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
               value={formData.category}
@@ -578,7 +580,7 @@ export default function VehicleForm() {
             </select>
           </label>
           <label className="md:col-span-2 space-y-2 text-sm font-medium text-secondary">
-            Description
+            Mo ta
             <textarea
               className="w-full rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface min-h-28"
               value={formData.description}
@@ -594,7 +596,7 @@ export default function VehicleForm() {
 
         {isEdit && (
           <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-3">
-            <h3 className="font-bold text-on-surface">Vehicle Status</h3>
+            <h3 className="font-bold text-on-surface">Trang thai xe</h3>
             <div className="flex items-center gap-3">
               <select
                 className="rounded-xl border border-outline-variant/20 px-3 py-2 text-on-surface"
@@ -618,7 +620,7 @@ export default function VehicleForm() {
                 disabled={isUpdatingStatus}
                 className="px-4 py-2 rounded-xl bg-on-surface text-white text-sm font-bold hover:bg-on-surface/90 disabled:opacity-60"
               >
-                {isUpdatingStatus ? "Updating..." : "Update Status"}
+                {isUpdatingStatus ? "Dang cap nhat..." : "Cap nhat trang thai"}
               </button>
             </div>
           </div>
@@ -626,12 +628,12 @@ export default function VehicleForm() {
 
         <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-4">
           <h3 className="font-bold text-on-surface flex items-center gap-2">
-            <ImageIcon size={16} /> Images
+            <ImageIcon size={16} /> Hinh anh
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-3">
             <input
               className="rounded-xl border border-outline-variant/20 px-3 py-2"
-              placeholder="Image URL"
+              placeholder="Duong dan anh"
               value={newImage.url}
               onChange={(e) =>
                 setNewImage((prev) => ({ ...prev, url: e.target.value }))
@@ -639,7 +641,7 @@ export default function VehicleForm() {
             />
             <input
               className="rounded-xl border border-outline-variant/20 px-3 py-2"
-              placeholder="Alt text"
+              placeholder="Mo ta anh"
               value={newImage.altText}
               onChange={(e) =>
                 setNewImage((prev) => ({ ...prev, altText: e.target.value }))
@@ -650,13 +652,13 @@ export default function VehicleForm() {
               onClick={handleAddImage}
               className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold"
             >
-              <Plus size={14} className="inline mr-1" /> Add
+              <Plus size={14} className="inline mr-1" /> Them
             </button>
           </div>
 
           <div className="space-y-2">
             {images.length === 0 && (
-              <p className="text-sm text-secondary">No images added.</p>
+              <p className="text-sm text-secondary">Chua co hinh anh.</p>
             )}
             {images.map((image, index) => (
               <div
@@ -687,12 +689,12 @@ export default function VehicleForm() {
 
         <div className="bg-white rounded-3xl border border-outline-variant/10 p-6 space-y-4">
           <h3 className="font-bold text-on-surface flex items-center gap-2">
-            <Sparkles size={16} /> Features
+            <Sparkles size={16} /> Tinh nang
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,auto] gap-3">
             <input
               className="rounded-xl border border-outline-variant/20 px-3 py-2"
-              placeholder="Feature name"
+              placeholder="Ten tinh nang"
               value={newFeature.featureName}
               onChange={(e) =>
                 setNewFeature((prev) => ({
@@ -703,7 +705,7 @@ export default function VehicleForm() {
             />
             <input
               className="rounded-xl border border-outline-variant/20 px-3 py-2"
-              placeholder="Feature value"
+              placeholder="Gia tri tinh nang"
               value={newFeature.featureValue}
               onChange={(e) =>
                 setNewFeature((prev) => ({
@@ -717,13 +719,13 @@ export default function VehicleForm() {
               onClick={handleAddFeature}
               className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-bold"
             >
-              <Plus size={14} className="inline mr-1" /> Add
+              <Plus size={14} className="inline mr-1" /> Them
             </button>
           </div>
 
           <div className="space-y-2">
             {features.length === 0 && (
-              <p className="text-sm text-secondary">No features added.</p>
+              <p className="text-sm text-secondary">Chua co tinh nang.</p>
             )}
             {features.map((feature, index) => (
               <div

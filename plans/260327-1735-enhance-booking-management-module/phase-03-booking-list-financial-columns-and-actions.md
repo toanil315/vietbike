@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Update booking table financial display and action controls: render amount/deposit directly from API values, remove Confirm button, and improve Detail/Edit interaction quality.
@@ -61,11 +61,11 @@ Modify:
 
 ## Todo List
 
-- [ ] Switch amount cell to raw API value rendering
-- [ ] Replace Status column with Deposit column
-- [ ] Remove confirm action and dead logic
-- [ ] Improve Detail/Edit interactive styling
-- [ ] Translate table text to Vietnamese
+- [x] Switch amount cell to raw API value rendering
+- [x] Replace Status column with Deposit column
+- [x] Remove confirm action and dead logic
+- [x] Improve Detail/Edit interactive styling
+- [x] Translate table text to Vietnamese
 
 ## Success Criteria
 

@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: In Progress  
 Effort: 3h
 
 Define a small baseline for interactive button states and Vietnamese admin terminology so downstream phases stay consistent and avoid duplicated styling/wording work.
@@ -51,7 +51,7 @@ Modify:
 
 ## Todo List
 
-- [ ] Finalize shared interaction class recipe for admin actions
+- [x] Finalize shared interaction class recipe for admin actions
 - [ ] Add Vietnamese term map/constants for repeated labels
 - [ ] Document rule: translate labels, never mutate API enum values
 

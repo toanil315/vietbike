@@ -1,44 +1,86 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# VietBike Frontend
 
-# Run and deploy your AI Studio app
+VietBike is a Next.js frontend for a bike rental platform with a public booking journey and an admin management portal.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/ad3977b2-3333-4050-b084-e41c6ed28383
+- Next.js 15 (App Router)
+- React 19 + TypeScript (strict)
+- Tailwind CSS v4
+- Zustand (state management)
+- Zod + React Hook Form (validation/forms)
 
-## Run Locally
+## Features
 
-**Prerequisites:**  Node.js
+- Public browsing and filtering of bikes
+- Bike detail pages
+- Multi-step booking flow with confirmation
+- Admin dashboard and management pages for vehicles/bookings
 
+## Quick Start
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Prerequisites
 
----
+- Node.js 20+
+- npm 10+
 
-## Migration Status
+### Install
 
-We are currently migrating this project from React + Vite to **Next.js 15**.
+```bash
+npm install
+```
 
-### Completed Phases
-- [x] Phase 0: Project Initialization & Config
-- [x] Phase 1: Root Layout & Global Styles
-- [x] Phase 2: UI Component Library Extraction
-- [x] Phase 3: Layout Components Migration
+### Environment
 
-### Pending Phases
-- [x] Phase 4: Homepage Migration
-- [x] Phase 5: Bikes Listing Migration
-- [x] Phase 6: Bike Detail Migration
-- [x] Phase 7: Booking Flow Migration
-- [x] Phase 8: Contact Page Migration
-- [x] Phase 9: Admin Panel Migration
-- [x] Phase 10: Cleanup & Final Polish
-- [x] Phase 11: SEO Enhancements
+Create `.env.local` with the required values:
 
-**MIGRATION COMPLETE.** All phases successfully finished.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5001
+NEXT_PUBLIC_API_TIMEOUT=30000
+NEXT_PUBLIC_ENABLE_DEBUG=false
+GEMINI_API_KEY=your_key_here
+```
+
+### Run
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Scripts
+
+- `npm run dev` - Start development server (Turbopack)
+- `npm run build` - Production build
+- `npm run start` - Start production server
+- `npm run lint` - Run linting
+
+## Project Structure
+
+```text
+src/
+  app/          # Next.js routes, layouts, server actions
+  components/   # Domain components + shared UI
+  hooks/        # Data fetching and mutation hooks
+  lib/          # API client, endpoints, validation, utilities
+  store/        # Zustand stores
+  types/        # Shared domain and API types
+```
+
+## Documentation
+
+Project documentation lives in `docs/`:
+
+- `docs/project-overview-pdr.md`
+- `docs/codebase-summary.md`
+- `docs/code-standards.md`
+- `docs/system-architecture.md`
+- `docs/project-roadmap.md`
+- `docs/deployment-guide.md`
+- `docs/design-guidelines.md`
+
+## Current Notes
+
+- Migration to Next.js is complete.
+- Remaining focus is stabilization and consistency (refund flow completion, add-ons completion, API response standardization, auth guard clarity).

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
 import {
@@ -18,6 +19,7 @@ interface UseBookingSyncTargetOptions {
 export function useBookingSyncTarget(
   options: UseBookingSyncTargetOptions = {},
 ) {
+  const router = useRouter();
   const [targets, setTargets] = useState<SyncSpreadsheetItem[]>([]);
   const [activeTarget, setActiveTarget] = useState<SyncTarget | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,11 +42,13 @@ export function useBookingSyncTarget(
   }, []);
 
   const triggerPull = useCallback(async () => {
-    return await apiClient.post<PullBookingSyncResult>(
+    const result = await apiClient.post<PullBookingSyncResult>(
       adminBookingEndpoints.syncPull(),
       { batchSize: 200 },
     );
-  }, []);
+    router.refresh();
+    return result;
+  }, [router]);
 
   const changeTarget = useCallback(
     async (payload: SetSyncTargetPayload) => {

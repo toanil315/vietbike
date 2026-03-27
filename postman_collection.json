@@ -1,0 +1,551 @@
+{
+  "info": {
+    "name": "VietBike Backend API",
+    "description": "Complete API testing collection for VietBike motorcycle rental application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Vehicle Management",
+      "item": [
+        {
+          "name": "Admin - Create Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Honda Winner X\",\n  \"slug\": \"honda-winner-x-2025\",\n  \"brand\": \"Honda\",\n  \"model\": \"Winner X\",\n  \"year\": 2025,\n  \"licensePlate\": \"HN-0001\",\n  \"type\": \"motorcycle\",\n  \"category\": \"economy\",\n  \"transmission\": \"automatic\",\n  \"fuelType\": \"petrol\",\n  \"availableSeats\": 2,\n  \"pricePerDay\": 150000,\n  \"description\": \"Reliable and fuel-efficient motorcycle ideal for city commuting and short trips\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles"]
+            }
+          }
+        },
+        {
+          "name": "Admin - List Vehicles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles?page=1&pageSize=10&search=winner&minPrice=100000&maxPrice=300000&status=available&sortBy=createdAt&sortOrder=desc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "search", "value": "winner" },
+                { "key": "minPrice", "value": "100000" },
+                { "key": "maxPrice", "value": "300000" },
+                { "key": "status", "value": "available" },
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get Vehicle by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles", "{{vehicleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Update Vehicle",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Honda Winner X - Updated\",\n  \"description\": \"Updated motorcycle with new condition\",\n  \"pricePerDay\": 175000\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles", "{{vehicleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Change Vehicle Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"maintenance\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles", "{{vehicleId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Add Vehicle Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://images.example.com/vehicles/winner-x/side.jpg\",\n  \"altText\": \"Honda Winner X side profile\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/images",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles", "{{vehicleId}}", "images"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Delete Vehicle Image",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/images/{{imageId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": [
+                "admin",
+                "vehicles",
+                "{{vehicleId}}",
+                "images",
+                "{{imageId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Reorder Vehicle Images",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reorderedImages\": [\n    {\n      \"id\": \"{{imageId}}\",\n      \"displayOrder\": 0\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/images/reorder",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": [
+                "admin",
+                "vehicles",
+                "{{vehicleId}}",
+                "images",
+                "reorder"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Add Vehicle Feature",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"featureName\": \"Phone Holder\",\n  \"featureValue\": \"Included\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/features",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["admin", "vehicles", "{{vehicleId}}", "features"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Delete Vehicle Feature",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:5001/admin/vehicles/{{vehicleId}}/features/{{featureId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": [
+                "admin",
+                "vehicles",
+                "{{vehicleId}}",
+                "features",
+                "{{featureId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Public - List Vehicles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/public/vehicles?page=1&pageSize=10&search=honda&status=available&minPrice=100000&maxPrice=300000&sortBy=createdAt&sortOrder=desc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["public", "vehicles"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "search", "value": "honda" },
+                { "key": "status", "value": "available" },
+                { "key": "minPrice", "value": "100000" },
+                { "key": "maxPrice", "value": "300000" },
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Public - Get Vehicle by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/public/vehicles/{{vehicleId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["public", "vehicles", "{{vehicleId}}"]
+            }
+          }
+        },
+        {
+          "name": "Public - Get Vehicle by Slug",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/public/vehicles/by-slug/honda-winner-x-2025",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["public", "vehicles", "by-slug", "honda-winner-x-2025"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking Management",
+      "item": [
+        {
+          "name": "Booking - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Nguyen Van A\",\n  \"customerPhone\": \"+84901234567\",\n  \"sourceApp\": \"web\",\n  \"licensePlate\": \"59A1-12345\",\n  \"startDate\": \"2026-03-25T08:00:00.000Z\",\n  \"rentalDays\": 3,\n  \"totalAmount\": \"600,000VND\",\n  \"depositAmount\": \"200,000VND\",\n  \"note\": \"Customer prefers delivery before 9AM\",\n  \"documents\": [\n    {\n      \"name\": \"license-photo.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"sizeBytes\": 248125\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/bookings",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings"]
+            }
+          }
+        },
+        {
+          "name": "Booking - Get by Reference",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/bookings/{{bookingReference}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "{{bookingReference}}"]
+            }
+          }
+        },
+        {
+          "name": "Booking - List",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/bookings?page=1&pageSize=10&status=pending&licensePlate=59A1-12345&customerName=Nguyen&customerPhone=0901&startDate=2026-03-25T00:00:00.000Z&endDate=2026-03-31T23:59:59.000Z&sortBy=created_at&sortOrder=desc",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "10" },
+                { "key": "status", "value": "pending" },
+                { "key": "licensePlate", "value": "59A1-12345" },
+                { "key": "customerName", "value": "Nguyen" },
+                { "key": "customerPhone", "value": "0901" },
+                { "key": "startDate", "value": "2026-03-25T00:00:00.000Z" },
+                { "key": "endDate", "value": "2026-03-31T23:59:59.000Z" },
+                { "key": "sortBy", "value": "created_at" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Booking - Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\",\n  \"reason\": \"Payment verified and approved by admin\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/bookings/{{bookingId}}/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "{{bookingId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Booking - Update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"licensePlate\": \"59A1-54321\",\n  \"pickupDate\": \"2026-03-26T08:00:00.000Z\",\n  \"dropoffDate\": \"2026-03-29T08:00:00.000Z\",\n  \"totalAmount\": \"650,000VND\",\n  \"depositAmount\": \"250,000VND\",\n  \"customerSnapshot\": {\n    \"fullName\": \"Nguyen Van B\",\n    \"phone\": \"+84909876543\"\n  },\n  \"sourceApp\": \"admin\",\n  \"note\": \"Admin adjusted rental window\",\n  \"currency\": \"VND\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/bookings/{{bookingId}}",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Booking Sync - List Spreadsheets",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/bookings/sync/spreadsheets?page=1&pageSize=20&search=",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "sync", "spreadsheets"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" },
+                { "key": "search", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Booking Sync - Get Active Target",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/bookings/sync/target",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "sync", "target"]
+            }
+          }
+        },
+        {
+          "name": "Booking Sync - Set Active Target",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spreadsheetId\": \"{{syncSpreadsheetId}}\",\n  \"sheetName\": \"Sheet1\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/bookings/sync/target",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "sync", "target"]
+            }
+          }
+        },
+        {
+          "name": "Booking Sync - Pull",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"batchSize\": 200\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/bookings/sync/pull",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["bookings", "sync", "pull"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Check API Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": []
+            }
+          }
+        },
+        {
+          "name": "Swagger Documentation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/api",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api"]
+            }
+          }
+        },
+        {
+          "name": "Swagger JSON",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/api-json",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api-json"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "vehicleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookingReference",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bookingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "syncSpreadsheetId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "imageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "featureId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    }
+  ]
+}

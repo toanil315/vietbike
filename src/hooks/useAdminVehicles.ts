@@ -45,7 +45,7 @@ export function useAdminVehicles(
           limit: limit.toString(),
           ...(filters?.status && { status: filters.status }),
           ...(filters?.type && { type: filters.type }),
-          ...(filters?.category && { category: filters.category }),
+          ...(filters?.category && { categoryId: filters.category }),
           ...(filters?.searchTerms &&
             filters.searchTerms.length > 0 && {
               search: filters.searchTerms.join(","),

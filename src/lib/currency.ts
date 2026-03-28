@@ -148,3 +148,22 @@ export function isPriceInRange(
   if (maxPrice && price > maxPrice) return false;
   return true;
 }
+
+/**
+ * Approximate VND-to-USD exchange rate for display purposes only
+ */
+const APPROX_VND_PER_USD = 25_000;
+
+/**
+ * Format a VND price with both local and approximate USD display.
+ * Used for DaNangBike-style dual pricing on vehicle cards.
+ */
+export function formatDualPrice(vndAmount: number): {
+  vnd: string;
+  usd: string;
+} {
+  return {
+    vnd: formatVND(vndAmount, { showCode: true }),
+    usd: `~ $${Math.round(vndAmount / APPROX_VND_PER_USD)} USD`,
+  };
+}

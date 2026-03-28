@@ -48,6 +48,15 @@ export interface VehicleFeature {
   featureValue: string;
 }
 
+export interface VehicleCategory_v2 {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Vehicle {
   id: string;
   slug: string;
@@ -55,8 +64,13 @@ export interface Vehicle {
   brand: string;
   model: string;
   year: number;
-  type: VehicleType;
-  category: VehicleCategory;
+  /** @deprecated Use categoryId/categoryName instead */
+  type?: VehicleType;
+  /** @deprecated Use categoryId/categoryName instead */
+  category?: VehicleCategory;
+  categoryId: string;
+  categoryName: string;
+  categoryDescription: string | null;
   licensePlate: string;
   pricePerDay: number;
   description: string | null;

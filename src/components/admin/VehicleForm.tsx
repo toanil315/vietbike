@@ -114,8 +114,8 @@ export default function VehicleForm() {
           availableSeats: vehicle.availableSeats,
           fuelType: vehicle.fuelType,
           transmission: vehicle.transmission,
-          type: vehicle.type,
-          category: vehicle.category,
+          type: vehicle.type || "scooter",
+          category: vehicle.category || "economy",
           status: vehicle.status,
         });
 

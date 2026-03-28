@@ -1,11 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  LayoutGrid,
+  List,
+  ChevronLeft,
+  ChevronRight,
+  Crown,
+  Bike,
+  Zap,
+  Fuel,
+} from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BikeFilterBar from "@/components/bikes/BikeFilterBar";
 import BikeGrid from "@/components/bikes/BikeGrid";
+import VehicleSection from "@/components/bikes/VehicleSection";
 import { Vehicle } from "@/types";
 
 interface BikesPagination {
@@ -15,16 +25,38 @@ interface BikesPagination {
   totalPages: number;
 }
 
+interface GroupedSection {
+  categoryName: string;
+  categoryId: string;
+  description: string | null;
+  vehicles: Vehicle[];
+}
+
 interface BikesClientProps {
   initialVehicles: Vehicle[];
   initialPagination: BikesPagination;
   initialHasError: boolean;
+  isFiltered: boolean;
+  groupedSections: GroupedSection[] | null;
+}
+
+/**
+ * Derive section icon from real backend category name
+ */
+function getSectionIcon(categoryName: string) {
+  const lower = categoryName.toLowerCase();
+  if (lower.includes("premium")) return <Crown size={18} />;
+  if (lower.includes("electric")) return <Zap size={18} />;
+  if (lower.includes("50cc")) return <Fuel size={18} />;
+  return <Bike size={18} />;
 }
 
 export default function BikesClient({
   initialVehicles,
   initialPagination,
   initialHasError,
+  isFiltered,
+  groupedSections,
 }: BikesClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -146,7 +178,32 @@ export default function BikesClient({
     updateRoute({ page: page.toString() });
   }
 
-  function renderVehicleCards() {
+  /** Section-based view: renders each category from real API data */
+  function renderSectionView() {
+    if (!groupedSections || groupedSections.length === 0) {
+      return renderNoResults();
+    }
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 md:px-8 divide-y divide-outline-variant/10">
+        {groupedSections.map((section) => (
+          <VehicleSection
+            key={section.categoryId}
+            icon={getSectionIcon(section.categoryName)}
+            sectionLabel="OUR BIKES"
+            title={section.categoryName}
+            subtitle={section.description || ""}
+            vehicles={section.vehicles}
+            viewAllHref={`/bikes?categoryId=${section.categoryId}`}
+            viewAllLabel={`View Full ${section.categoryName}`}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  /** Flat grid view when filters are active */
+  function renderFilteredView() {
     if (hasError) {
       return <VehiclesError />;
     }
@@ -170,6 +227,7 @@ export default function BikesClient({
             updateRoute({
               brand: undefined,
               type: undefined,
+              categoryId: undefined,
               transmission: undefined,
               minPrice: undefined,
               maxPrice: undefined,
@@ -277,6 +335,37 @@ export default function BikesClient({
     );
   }
 
+  // Section-based view for unfiltered, flat grid for filtered
+  if (!isFiltered) {
+    return (
+      <>
+        {/* Filter bar at top — entering any filter switches to flat grid */}
+        <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
+          <BikeFilterBar
+            type={type}
+            setType={handleTypeChange}
+            brand={brand}
+            setBrand={handleBrandChange}
+            transmission={transmission}
+            setTransmission={handleTransmissionChange}
+            sortBy={sortBy}
+            setSortBy={handleSortByChange}
+            priceRange={priceRange}
+            setPriceRange={handlePriceRangeChange}
+          />
+        </div>
+
+        {hasError ? (
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <VehiclesError />
+          </div>
+        ) : (
+          renderSectionView()
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
@@ -296,10 +385,15 @@ export default function BikesClient({
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 mb-6 flex justify-between items-center">
         {renderViewModeToggle()}
+        {pagination && (
+          <span className="text-sm text-secondary font-medium">
+            {pagination.total} bikes found
+          </span>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        {renderVehicleCards()}
+        {renderFilteredView()}
       </div>
 
       {renderPagination()}

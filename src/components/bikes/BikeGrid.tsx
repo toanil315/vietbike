@@ -63,7 +63,7 @@ export default function BikeGrid({ bikes, viewMode }: BikeGridProps) {
             />
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-bold text-primary uppercase tracking-wider shadow-sm">
-                {bike.category}
+                {bike.categoryName}
               </span>
             </div>
             <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-secondary hover:text-primary transition-colors shadow-sm">

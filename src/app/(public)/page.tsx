@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import HeroSection from '@/components/home/HeroSection';
 import SearchBar from '@/components/home/SearchBar';
+import CategoryNav from '@/components/bikes/CategoryNav';
 import FeaturedBikes from '@/components/home/FeaturedBikes';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import CTASection from '@/components/home/CTASection';
@@ -22,6 +23,7 @@ export default function HomePage() {
       <div className="md:block hidden">
         <SearchBar />
       </div>
+      <CategoryNav />
       <FeaturedBikes />
       <div className="md:hidden block">
         <SearchBar />

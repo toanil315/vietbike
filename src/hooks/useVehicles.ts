@@ -54,7 +54,7 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
     if (opts.page) params.append("page", opts.page.toString());
     if (opts.limit) params.append("pageSize", opts.limit.toString());
     if (opts.type) params.append("type", opts.type);
-    if (opts.category) params.append("category", opts.category);
+    if (opts.category) params.append("categoryId", opts.category);
     if (opts.transmission) params.append("transmission", opts.transmission);
     if (opts.priceMin) params.append("minPrice", opts.priceMin.toString());
     if (opts.priceMax) params.append("maxPrice", opts.priceMax.toString());

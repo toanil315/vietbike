@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 interface BikesPageSearchParams {
   page?: string;
   pageSize?: string;
-  type?: string;
+  categoryId?: string;
   transmission?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -34,20 +34,37 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+/** Check whether any filter params are active */
+function hasActiveFilters(params: BikesPageSearchParams): boolean {
+  return !!(
+    params.categoryId ||
+    params.transmission ||
+    params.minPrice ||
+    params.maxPrice ||
+    params.search ||
+    params.sortBy
+  );
+}
+
 async function fetchBikes(searchParams: BikesPageSearchParams): Promise<{
   vehicles: Vehicle[];
   pagination: BikesPagination;
   hasError: boolean;
 }> {
   const page = parsePositiveInt(searchParams.page, 1);
-  const pageSize = parsePositiveInt(searchParams.pageSize, 12);
+  // Fetch more vehicles when showing sections (no active filters)
+  const isFiltered = hasActiveFilters(searchParams);
+  const pageSize = parsePositiveInt(
+    searchParams.pageSize,
+    isFiltered ? 12 : 50,
+  );
 
   const params = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString(),
   });
 
-  if (searchParams.type) params.set("type", searchParams.type);
+  if (searchParams.categoryId) params.set("categoryId", searchParams.categoryId);
   if (searchParams.transmission)
     params.set("transmission", searchParams.transmission);
   if (searchParams.minPrice) params.set("minPrice", searchParams.minPrice);
@@ -61,44 +78,73 @@ async function fetchBikes(searchParams: BikesPageSearchParams): Promise<{
     process.env.API_URL ||
     "http://localhost:5001";
 
-  const response = await fetch(
-    `${apiUrl}/public/vehicles?${params.toString()}`,
-    {
-      next: { revalidate: 300 },
-    },
-  );
+  try {
+    const response = await fetch(
+      `${apiUrl}/public/vehicles?${params.toString()}`,
+      { next: { revalidate: 300 } },
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return {
+        vehicles: [],
+        pagination: { page, pageSize, total: 0, totalPages: 1 },
+        hasError: true,
+      };
+    }
+
+    const payload = (await response.json()) as {
+      success?: boolean;
+      data?: {
+        data?: Vehicle[];
+        pagination?: BikesPagination;
+      };
+    };
+
     return {
-      vehicles: [],
-      pagination: {
+      vehicles: payload?.data?.data || [],
+      pagination: payload?.data?.pagination || {
         page,
         pageSize,
         total: 0,
         totalPages: 1,
       },
+      hasError: false,
+    };
+  } catch {
+    return {
+      vehicles: [],
+      pagination: { page, pageSize, total: 0, totalPages: 1 },
       hasError: true,
     };
   }
+}
 
-  const payload = (await response.json()) as {
-    success?: boolean;
-    data?: {
-      data?: Vehicle[];
-      pagination?: BikesPagination;
-    };
-  };
+/**
+ * Group vehicles by real backend categoryName for section-based display.
+ * Returns a Map keyed by categoryName preserving insertion order.
+ */
+function groupVehiclesByCategory(
+  vehicles: Vehicle[],
+): Map<string, { categoryId: string; description: string | null; vehicles: Vehicle[] }> {
+  const groups = new Map<
+    string,
+    { categoryId: string; description: string | null; vehicles: Vehicle[] }
+  >();
 
-  return {
-    vehicles: payload?.data?.data || [],
-    pagination: payload?.data?.pagination || {
-      page,
-      pageSize,
-      total: 0,
-      totalPages: 1,
-    },
-    hasError: false,
-  };
+  for (const v of vehicles) {
+    const existing = groups.get(v.categoryName);
+    if (existing) {
+      existing.vehicles.push(v);
+    } else {
+      groups.set(v.categoryName, {
+        categoryId: v.categoryId,
+        description: v.categoryDescription,
+        vehicles: [v],
+      });
+    }
+  }
+
+  return groups;
 }
 
 export default async function BikesPage({
@@ -110,6 +156,21 @@ export default async function BikesPage({
   const { vehicles, pagination, hasError } =
     await fetchBikes(resolvedSearchParams);
 
+  const isFiltered = hasActiveFilters(resolvedSearchParams);
+  const groupedByCategory = isFiltered
+    ? null
+    : groupVehiclesByCategory(vehicles);
+
+  // Serialize Map to a plain array for client component
+  const groupedSections = groupedByCategory
+    ? Array.from(groupedByCategory.entries()).map(([name, data]) => ({
+        categoryName: name,
+        categoryId: data.categoryId,
+        description: data.description,
+        vehicles: data.vehicles,
+      }))
+    : null;
+
   return (
     <div className="bg-surface-container/30 min-h-screen pb-20">
       {/* Breadcrumbs & Header */}
@@ -119,7 +180,7 @@ export default async function BikesPage({
             Home
           </Link>
           <ChevronRight size={12} />
-          <span className="text-on-surface">Bikes</span>
+          <span className="text-on-surface">Our Bikes</span>
         </nav>
 
         <h1 className="text-4xl md:text-5xl font-bold text-on-surface mb-4">
@@ -134,6 +195,8 @@ export default async function BikesPage({
         initialVehicles={vehicles}
         initialPagination={pagination}
         initialHasError={hasError}
+        isFiltered={isFiltered}
+        groupedSections={groupedSections}
       />
     </div>
   );

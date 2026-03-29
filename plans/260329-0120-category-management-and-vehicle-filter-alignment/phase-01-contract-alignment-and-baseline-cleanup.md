@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Create one contract baseline for category and vehicle domain before building new UI.
@@ -56,10 +56,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Add category endpoint builders in API map
-- [ ] Normalize category DTO types in shared types file
-- [ ] Mark and isolate deprecated category union paths
-- [ ] Verify no compile break in hooks referencing category fields
+- [x] Add category endpoint builders in API map
+- [x] Normalize category DTO types in shared types file
+- [x] Mark and isolate deprecated category union paths
+- [x] Verify no compile break in hooks referencing category fields
 
 ## Success Criteria
 

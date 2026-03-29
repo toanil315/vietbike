@@ -14,13 +14,12 @@ import { handleApiError, AppError } from "@/lib/error-handler";
 interface UseVehiclesOptions {
   page?: number;
   limit?: number;
-  type?: string;
-  category?: string;
-  transmission?: string;
+  categoryId?: string;
   priceMin?: number;
   priceMax?: number;
   search?: string;
-  sortBy?: "price_asc" | "price_desc" | "rating" | "newest";
+  sortBy?: "pricePerDay" | "rating";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedData<T> {
@@ -53,13 +52,12 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
 
     if (opts.page) params.append("page", opts.page.toString());
     if (opts.limit) params.append("pageSize", opts.limit.toString());
-    if (opts.type) params.append("type", opts.type);
-    if (opts.category) params.append("categoryId", opts.category);
-    if (opts.transmission) params.append("transmission", opts.transmission);
+    if (opts.categoryId) params.append("categoryId", opts.categoryId);
     if (opts.priceMin) params.append("minPrice", opts.priceMin.toString());
     if (opts.priceMax) params.append("maxPrice", opts.priceMax.toString());
     if (opts.search) params.append("search", opts.search);
     if (opts.sortBy) params.append("sortBy", opts.sortBy);
+    if (opts.sortOrder) params.append("sortOrder", opts.sortOrder);
 
     const query = params.toString();
     return query ? `?${query}` : "";
@@ -95,13 +93,12 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
   }, [
     options.page,
     options.limit,
-    options.type,
-    options.category,
-    options.transmission,
+    options.categoryId,
     options.priceMin,
     options.priceMax,
     options.search,
     options.sortBy,
+    options.sortOrder,
   ]);
 
   const mutate = useCallback(
@@ -217,7 +214,14 @@ export async function prefetchVehicles(options: UseVehiclesOptions = {}) {
     const params = new URLSearchParams();
     if (options.page) params.append("page", options.page.toString());
     if (options.limit) params.append("limit", options.limit.toString());
-    if (options.type) params.append("type", options.type);
+    if (options.categoryId) params.append("categoryId", options.categoryId);
+    if (options.search) params.append("search", options.search);
+    if (options.priceMin)
+      params.append("minPrice", options.priceMin.toString());
+    if (options.priceMax)
+      params.append("maxPrice", options.priceMax.toString());
+    if (options.sortBy) params.append("sortBy", options.sortBy);
+    if (options.sortOrder) params.append("sortOrder", options.sortOrder);
 
     const queryString = params.toString();
     const endpoint = `${vehicleEndpoints.list()}${queryString ? `?${queryString}` : ""}`;

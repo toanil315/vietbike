@@ -54,7 +54,7 @@ export interface VehicleFormInput {
   fuelType: string;
   transmission: "manual" | "automatic";
   type: "motorcycle" | "scooter" | "electric";
-  category: "economy" | "comfort" | "premium";
+  categoryId: string;
   images?: Array<{ url: string; altText?: string }>;
   features?: Array<{ featureName: string; featureValue: string }>;
 }
@@ -77,7 +77,12 @@ export async function createVehicleAction(input: VehicleFormInput) {
 
 export async function updateVehicleAction(
   vehicleId: string,
-  input: Omit<VehicleFormInput, "type" | "category" | "images" | "features">,
+  input: Omit<
+    VehicleFormInput,
+    "type" | "images" | "features" | "categoryId"
+  > & {
+    categoryId?: string;
+  },
 ) {
   const result = await request<{ id: string; name: string; slug: string }>(
     adminVehicleEndpoints.update(vehicleId),

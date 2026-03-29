@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { MapPin, Clock, Bike } from 'lucide-react';
+import Link from "next/link";
+import { MapPin, Clock } from "lucide-react";
 
 export default function SearchBar() {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-12 relative z-20">
       <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-outline-variant/10 flex flex-wrap items-center gap-8">
-        <div className="flex-1 min-w-[200px] space-y-2">
+        <div className="flex-1 min-w-50 space-y-2">
           <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">
             Location
           </label>
@@ -22,7 +22,7 @@ export default function SearchBar() {
           </div>
         </div>
         <div className="w-px h-12 bg-outline-variant/20 hidden md:block"></div>
-        <div className="flex-1 min-w-[200px] space-y-2">
+        <div className="flex-1 min-w-50 space-y-2">
           <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">
             Pickup Date
           </label>
@@ -35,18 +35,17 @@ export default function SearchBar() {
           </div>
         </div>
         <div className="w-px h-12 bg-outline-variant/20 hidden md:block"></div>
-        <div className="flex-1 min-w-[200px] space-y-2">
+        <div className="flex-1 min-w-50 space-y-2">
           <label className="text-[10px] uppercase font-bold text-secondary tracking-wider">
-            Bike Type
+            Search
           </label>
           <div className="flex items-center gap-3">
-            <Bike size={20} className="text-primary" />
-            <select className="bg-transparent font-bold text-on-surface focus:outline-none w-full appearance-none cursor-pointer">
-              <option>All Types</option>
-              <option>Scooter</option>
-              <option>Sport</option>
-              <option>Off-road</option>
-            </select>
+            <input
+              type="text"
+              className="bg-transparent font-bold text-on-surface focus:outline-none w-full"
+              placeholder="Search by bike name"
+              readOnly
+            />
           </div>
         </div>
         <Link

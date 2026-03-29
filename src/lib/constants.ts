@@ -13,8 +13,6 @@
 
 export const VEHICLE_TYPES = ["motorcycle", "scooter", "electric"] as const;
 
-export const VEHICLE_CATEGORIES = ["economy", "comfort", "premium"] as const;
-
 export const TRANSMISSION_TYPES = [
   "manual",
   "automatic",
@@ -36,15 +34,6 @@ export const VEHICLE_TYPE_LABELS: Record<
   motorcycle: "Motorbike",
   scooter: "Scooter",
   electric: "Electric Vehicle",
-};
-
-export const VEHICLE_CATEGORY_LABELS: Record<
-  (typeof VEHICLE_CATEGORIES)[number],
-  string
-> = {
-  economy: "Economy",
-  comfort: "Comfort",
-  premium: "Premium",
 };
 
 export const TRANSMISSION_LABELS: Record<

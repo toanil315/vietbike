@@ -37,19 +37,15 @@ export const emailSchema = z
 
 export const vehicleFilterSchema = z.object({
   search: z.string().trim().optional(),
-  type: z.enum(["motorcycle", "scooter", "electric"]).optional(),
-  category: z.enum(["economy", "comfort", "premium"]).optional(),
-  transmission: z.enum(["manual", "automatic", "semi-automatic"]).optional(),
+  categoryId: z.string().trim().optional(),
   priceMin: z.number().positive("Minimum price must be positive").optional(),
   priceMax: z.number().positive("Maximum price must be positive").optional(),
-  sortBy: z
-    .enum(["price_asc", "price_desc", "rating", "newest"])
-    .optional()
-    .default("newest"),
+  sortBy: z.enum(["pricePerDay", "rating"]).optional(),
+  sortOrder: z.enum(["asc", "desc"]).optional(),
   page: z.number().positive("Page must be positive").optional().default(1),
-  limit: z
+  pageSize: z
     .number()
-    .positive("Limit must be positive")
+    .positive("Page size must be positive")
     .max(100)
     .optional()
     .default(20),
@@ -183,13 +179,13 @@ export const vehicleCreateSchema = z.object({
   model: z.string().min(2).max(100),
   year: z.number().int().min(2000).max(new Date().getFullYear()),
   type: z.enum(["motorcycle", "scooter", "electric"]),
-  category: z.enum(["economy", "comfort", "premium"]),
-  transmission: z.enum(["manual", "automatic", "semi-automatic"]),
-  basePrice: priceSchema,
-  locationId: z.string().uuid("Invalid location"),
+  categoryId: z.string().min(1, "Category is required"),
+  transmission: z.enum(["manual", "automatic"]),
+  pricePerDay: priceSchema,
+  licensePlate: z.string().trim().min(3).max(30),
+  availableSeats: z.number().int().min(1).max(20),
   description: z.string().max(2000).optional(),
-  fuelType: z.enum(["petrol", "diesel", "electric"]).optional(),
-  engineDisplacement: z.number().positive().optional(),
+  fuelType: z.string().trim().min(1).max(50),
 });
 
 export type VehicleCreateInput = z.infer<typeof vehicleCreateSchema>;

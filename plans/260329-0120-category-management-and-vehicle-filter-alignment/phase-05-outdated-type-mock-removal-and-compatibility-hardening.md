@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 3h
 
 Remove deprecated category/type mock artifacts after new category and filter flows are fully integrated.
@@ -52,10 +52,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Remove stale category mock constants/usages
-- [ ] Reduce deprecated category union reliance
-- [ ] Ensure category display components use backend category fields only
-- [ ] Verify type safety with strict TypeScript settings
+- [x] Remove stale category mock constants/usages
+- [x] Reduce deprecated category union reliance
+- [x] Ensure category display components use backend category fields only
+- [x] Verify type safety with strict TypeScript settings
 
 ## Success Criteria
 

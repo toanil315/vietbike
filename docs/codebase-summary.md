@@ -33,6 +33,7 @@ Admin routes are under `src/app/admin`:
 
 - `/admin`
 - `/admin/vehicles`
+- `/admin/categories`
 - `/admin/bookings`
 - `/admin/customers`
 - `/admin/finance`
@@ -58,7 +59,8 @@ Admin routes are under `src/app/admin`:
 
 1. Admin dashboard reads vehicles/bookings snapshots.
 2. Vehicle and booking pages expose CRUD/status operations.
-3. Mutations trigger cache/path revalidation to refresh views.
+3. Category page exposes category CRUD operations for vehicle taxonomy.
+4. Mutations trigger cache/path revalidation to refresh views.
 
 ## Notable Patterns
 

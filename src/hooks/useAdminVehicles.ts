@@ -19,9 +19,8 @@ export function useAdminVehicles(
   limit: number = 20,
   filters?: {
     status?: string;
-    type?: string;
-    category?: string;
-    searchTerms?: string[];
+    categoryId?: string;
+    search?: string;
   },
 ) {
   const [data, setData] = useState<Vehicle[]>([]);
@@ -44,12 +43,8 @@ export function useAdminVehicles(
           page: page.toString(),
           limit: limit.toString(),
           ...(filters?.status && { status: filters.status }),
-          ...(filters?.type && { type: filters.type }),
-          ...(filters?.category && { categoryId: filters.category }),
-          ...(filters?.searchTerms &&
-            filters.searchTerms.length > 0 && {
-              search: filters.searchTerms.join(","),
-            }),
+          ...(filters?.categoryId && { categoryId: filters.categoryId }),
+          ...(filters?.search && { search: filters.search }),
         });
 
         const endpoint = `${adminVehicleEndpoints.list()}?${params.toString()}`;

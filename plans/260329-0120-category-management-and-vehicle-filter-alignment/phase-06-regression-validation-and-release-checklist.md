@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: In Progress  
 Effort: 2h
 
 Validate end-to-end behavior for category CRUD, vehicle CRUD, and filter flows before release.
@@ -59,11 +59,11 @@ Modify:
 
 ## Todo List
 
-- [ ] Run `npm run build`
+- [x] Run `npm run build`
 - [ ] Smoke test admin categories CRUD
 - [ ] Smoke test vehicle create/edit + category linkage
 - [ ] Smoke test admin/public filter behavior
-- [ ] Update plan progress/status fields
+- [x] Update plan progress/status fields
 
 ## Success Criteria
 

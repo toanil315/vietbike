@@ -21,7 +21,7 @@ Public:
 Admin:
 
 - Monitoring (`/admin`)
-- Operations (`/admin/vehicles`, `/admin/bookings`)
+- Operations (`/admin/vehicles`, `/admin/bookings`, `/admin/categories`)
 - Supporting modules (`/admin/customers`, `/admin/finance`, `/admin/vouchers`)
 
 ## UI System Guidance

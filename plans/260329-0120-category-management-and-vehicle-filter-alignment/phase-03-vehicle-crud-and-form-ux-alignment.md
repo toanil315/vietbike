@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 8h
 
 Align vehicle create/update contracts with categoryId model and redesign vehicle form fields to match clearer booking-form style.
@@ -70,11 +70,11 @@ Create (if needed to keep file size manageable):
 
 ## Todo List
 
-- [ ] Replace static category options with backend category list
-- [ ] Add placeholders and clearer field grouping in vehicle form
-- [ ] Extract shared field component pattern if form file grows too large
-- [ ] Keep create/update payloads backend-compatible
-- [ ] Preserve image/feature sub-resource flows
+- [x] Replace static category options with backend category list
+- [x] Add placeholders and clearer field grouping in vehicle form
+- [x] Extract shared field component pattern if form file grows too large
+- [x] Keep create/update payloads backend-compatible
+- [x] Preserve image/feature sub-resource flows
 
 ## Success Criteria
 

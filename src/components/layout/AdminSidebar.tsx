@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Bike, 
-  CalendarCheck, 
-  Users, 
-  Ticket, 
-  BarChart3, 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Bike,
+  CalendarCheck,
+  Users,
+  BarChart3,
   Settings,
   LogOut,
-  ChevronRight,
   Plus,
-  HelpCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  HelpCircle,
+  Tags,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   const menuItems = [
-    { name: 'Tổng quan', icon: LayoutDashboard, href: '/admin' },
-    { name: 'Đặt xe', icon: CalendarCheck, href: '/admin/bookings' },
-    { name: 'Kho xe', icon: Bike, href: '/admin/vehicles' },
-    { name: 'Khách hàng', icon: Users, href: '/admin/customers' },
-    { name: 'Doanh thu', icon: BarChart3, href: '/admin/finance' },
-    { name: 'Cài đặt', icon: Settings, href: '/admin/settings' },
+    { name: "Tổng quan", icon: LayoutDashboard, href: "/admin" },
+    { name: "Đặt xe", icon: CalendarCheck, href: "/admin/bookings" },
+    { name: "Kho xe", icon: Bike, href: "/admin/vehicles" },
+    { name: "Danh mục xe", icon: Tags, href: "/admin/categories" },
+    { name: "Khách hàng", icon: Users, href: "/admin/customers" },
+    { name: "Doanh thu", icon: BarChart3, href: "/admin/finance" },
+    { name: "Cài đặt", icon: Settings, href: "/admin/settings" },
   ];
 
   return (
@@ -36,25 +36,32 @@ export default function AdminSidebar() {
           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
             <Bike size={20} />
           </div>
-          <span className="font-bold text-lg text-on-surface">VietBike Admin</span>
+          <span className="font-bold text-lg text-on-surface">
+            VietBike Admin
+          </span>
         </Link>
       </div>
 
       <nav className="flex-1 px-4 space-y-1">
         {menuItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-default group",
-                isActive 
-                  ? "bg-emerald-50 text-emerald-700" 
-                  : "text-secondary hover:bg-surface-container"
+                isActive
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "text-secondary hover:bg-surface-container",
               )}
             >
-              <item.icon size={20} className={cn(isActive ? "text-emerald-600" : "text-secondary")} />
+              <item.icon
+                size={20}
+                className={cn(isActive ? "text-emerald-600" : "text-secondary")}
+              />
               <span className="font-medium">{item.name}</span>
             </Link>
           );
@@ -62,7 +69,7 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="p-4 space-y-4">
-        <Link 
+        <Link
           href="/admin/bookings/new"
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#006D5B] text-white font-bold text-sm shadow-lg shadow-emerald-900/10 hover:bg-[#005a4b] transition-default"
         >

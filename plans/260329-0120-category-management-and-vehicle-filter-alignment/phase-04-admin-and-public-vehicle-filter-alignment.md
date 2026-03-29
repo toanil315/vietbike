@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 5h
 
 Remove mock filter UI/params and align admin + public vehicle list filtering to confirmed backend-supported fields.
@@ -73,11 +73,11 @@ Modify:
 
 ## Todo List
 
-- [ ] Refactor public filter bar to backend-supported fields only
-- [ ] Remove mock brand/type/transmission query plumbing
-- [ ] Add/align admin categoryId filter in vehicle table + page query
-- [ ] Keep pagination and clear-filter actions stable
-- [ ] Verify URL compatibility for unsupported legacy params
+- [x] Refactor public filter bar to backend-supported fields only
+- [x] Remove mock brand/type/transmission query plumbing
+- [x] Add/align admin categoryId filter in vehicle table + page query
+- [x] Keep pagination and clear-filter actions stable
+- [x] Verify URL compatibility for unsupported legacy params
 
 ## Success Criteria
 

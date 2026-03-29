@@ -38,6 +38,7 @@ Architecture style:
 - Root layout (`src/app/layout.tsx`) provides global shell and metadata.
 - Public route group (`src/app/(public)`) wraps customer-facing pages.
 - Admin layout (`src/app/admin/layout.tsx`) wraps internal management pages.
+- Admin categories route (`/admin/categories`) manages vehicle taxonomy CRUD.
 - Dynamic route (`/bikes/[slug]`) supports per-bike detail pages.
 
 ## Data Flow
@@ -58,8 +59,9 @@ Booking flow:
 Admin flow:
 
 1. Admin pages load lists and aggregate metrics.
-2. CRUD/status actions call admin endpoints.
-3. Revalidation refreshes route data after mutation.
+2. Vehicle category CRUD runs through `/admin/vehicle-categories` endpoints.
+3. Vehicle and booking CRUD/status actions call admin endpoints.
+4. Revalidation refreshes route data after mutation.
 
 ## Error and Validation Strategy
 

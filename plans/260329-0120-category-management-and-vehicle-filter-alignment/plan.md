@@ -1,7 +1,7 @@
 ---
 title: "Implement Category Management and Vehicle Alignment"
 description: "Add admin vehicle category CRUD, align vehicle CRUD with category contract, and remove outdated vehicle filter/type mocks in admin and public pages."
-status: pending
+status: in-progress
 priority: P1
 effort: 30h
 issue: null
@@ -28,14 +28,14 @@ Rationale:
 
 ## Phase Map
 
-| #   | Phase                                                  | Status  | Effort | File                                                                                                                                       |
-| --- | ------------------------------------------------------ | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Contract alignment and baseline cleanup                | Pending | 4h     | [phase-01-contract-alignment-and-baseline-cleanup.md](./phase-01-contract-alignment-and-baseline-cleanup.md)                               |
-| 2   | Admin category CRUD module                             | Pending | 8h     | [phase-02-admin-category-crud-module.md](./phase-02-admin-category-crud-module.md)                                                         |
-| 3   | Vehicle CRUD and form UX alignment                     | Pending | 8h     | [phase-03-vehicle-crud-and-form-ux-alignment.md](./phase-03-vehicle-crud-and-form-ux-alignment.md)                                         |
-| 4   | Admin and public vehicle filter alignment              | Pending | 5h     | [phase-04-admin-and-public-vehicle-filter-alignment.md](./phase-04-admin-and-public-vehicle-filter-alignment.md)                           |
-| 5   | Outdated type/mock removal and compatibility hardening | Pending | 3h     | [phase-05-outdated-type-mock-removal-and-compatibility-hardening.md](./phase-05-outdated-type-mock-removal-and-compatibility-hardening.md) |
-| 6   | Regression validation and release checklist            | Pending | 2h     | [phase-06-regression-validation-and-release-checklist.md](./phase-06-regression-validation-and-release-checklist.md)                       |
+| #   | Phase                                                  | Status      | Effort | File                                                                                                                                       |
+| --- | ------------------------------------------------------ | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Contract alignment and baseline cleanup                | Completed   | 4h     | [phase-01-contract-alignment-and-baseline-cleanup.md](./phase-01-contract-alignment-and-baseline-cleanup.md)                               |
+| 2   | Admin category CRUD module                             | Completed   | 8h     | [phase-02-admin-category-crud-module.md](./phase-02-admin-category-crud-module.md)                                                         |
+| 3   | Vehicle CRUD and form UX alignment                     | Completed   | 8h     | [phase-03-vehicle-crud-and-form-ux-alignment.md](./phase-03-vehicle-crud-and-form-ux-alignment.md)                                         |
+| 4   | Admin and public vehicle filter alignment              | Completed   | 5h     | [phase-04-admin-and-public-vehicle-filter-alignment.md](./phase-04-admin-and-public-vehicle-filter-alignment.md)                           |
+| 5   | Outdated type/mock removal and compatibility hardening | Completed   | 3h     | [phase-05-outdated-type-mock-removal-and-compatibility-hardening.md](./phase-05-outdated-type-mock-removal-and-compatibility-hardening.md) |
+| 6   | Regression validation and release checklist            | In Progress | 2h     | [phase-06-regression-validation-and-release-checklist.md](./phase-06-regression-validation-and-release-checklist.md)                       |
 
 ## Dependency Graph
 
@@ -147,3 +147,9 @@ Phase 6 ownership:
 - Admin/public filters only expose backend-supported filter fields.
 - No stale `VehicleCategory` string-union usage in runtime paths.
 - `npm run build` passes.
+
+## Progress Notes
+
+- Completed: Phase 1, 2, 3, 4, 5 implementation.
+- Completed: Production build + typecheck (`npm run build`).
+- In progress: Manual smoke validation for admin/public runtime flows in browser environment.

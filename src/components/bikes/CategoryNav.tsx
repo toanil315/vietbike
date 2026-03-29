@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { VehicleCategory_v2 } from "@/types";
+import { VehicleCategory } from "@/types";
 
 /**
  * Derive visual config from the real backend category name
@@ -48,7 +48,7 @@ function getCategoryVisuals(name: string) {
   };
 }
 
-async function fetchCategories(): Promise<VehicleCategory_v2[]> {
+async function fetchCategories(): Promise<VehicleCategory[]> {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
   try {
@@ -60,7 +60,7 @@ async function fetchCategories(): Promise<VehicleCategory_v2[]> {
 
     const payload = (await response.json()) as {
       success: boolean;
-      data?: { items: VehicleCategory_v2[] };
+      data?: { items: VehicleCategory[] };
     };
 
     return payload?.data?.items || [];
@@ -97,9 +97,7 @@ export default async function CategoryNav() {
                 visuals.colorClass,
               )}
             >
-              <span className="text-3xl md:text-4xl mb-1">
-                {visuals.emoji}
-              </span>
+              <span className="text-3xl md:text-4xl mb-1">{visuals.emoji}</span>
               <span className="font-bold text-on-surface text-sm md:text-base text-center">
                 {cat.name}
               </span>

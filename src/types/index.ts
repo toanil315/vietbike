@@ -9,7 +9,6 @@ export type VehicleStatus =
   | "maintenance"
   | "unavailable";
 export type VehicleTransmission = "manual" | "automatic";
-export type VehicleCategory = "economy" | "comfort" | "premium";
 export type VehicleType = "motorcycle" | "scooter" | "electric";
 
 export interface ApiSuccess<T> {
@@ -48,13 +47,18 @@ export interface VehicleFeature {
   featureValue: string;
 }
 
-export interface VehicleCategory_v2 {
+export interface VehicleCategory {
   id: string;
   name: string;
   description: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface VehicleCategoryListResponse {
+  items: VehicleCategory[];
+  pagination?: Pagination;
 }
 
 export interface Vehicle {
@@ -64,10 +68,7 @@ export interface Vehicle {
   brand: string;
   model: string;
   year: number;
-  /** @deprecated Use categoryId/categoryName instead */
   type?: VehicleType;
-  /** @deprecated Use categoryId/categoryName instead */
-  category?: VehicleCategory;
   categoryId: string;
   categoryName: string;
   categoryDescription: string | null;

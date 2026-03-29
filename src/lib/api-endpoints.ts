@@ -191,6 +191,36 @@ export const adminVehicleEndpoints = {
 };
 
 // ============================================================================
+// ADMIN VEHICLE CATEGORY ENDPOINTS
+// ============================================================================
+
+export const adminVehicleCategoryEndpoints = {
+  /**
+   * GET /admin/vehicle-categories
+   * List vehicle categories
+   */
+  list: () => "/admin/vehicle-categories",
+
+  /**
+   * POST /admin/vehicle-categories
+   * Create vehicle category
+   */
+  create: () => "/admin/vehicle-categories",
+
+  /**
+   * PATCH /admin/vehicle-categories/:id
+   * Update vehicle category
+   */
+  update: (id: string) => `/admin/vehicle-categories/${id}`,
+
+  /**
+   * DELETE /admin/vehicle-categories/:id
+   * Delete vehicle category
+   */
+  delete: (id: string) => `/admin/vehicle-categories/${id}`,
+};
+
+// ============================================================================
 // ADMIN BOOKING ENDPOINTS
 // ============================================================================
 
@@ -352,6 +382,7 @@ export const apiEndpoints = {
   voucher: voucherEndpoints,
   adminAuth: adminAuthEndpoints,
   adminVehicle: adminVehicleEndpoints,
+  adminVehicleCategory: adminVehicleCategoryEndpoints,
   adminBooking: adminBookingEndpoints,
   adminCustomer: adminCustomerEndpoints,
   adminVoucher: adminVoucherEndpoints,

@@ -68,13 +68,15 @@ export default async function AdminVehiclesPage({
   const pageSize = Number(params?.pageSize || 20);
   const search = typeof params?.search === "string" ? params.search : "";
   const status = typeof params?.status === "string" ? params.status : "";
-  const type = typeof params?.type === "string" ? params.type : "";
+  const categoryId =
+    typeof params?.categoryId === "string" ? params.categoryId : "";
 
   const query = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
     ...(search ? { search } : {}),
     ...(status ? { status } : {}),
+    ...(categoryId ? { categoryId } : {}),
   });
 
   const vehiclesData = await getVehiclesData(query);
@@ -91,7 +93,7 @@ export default async function AdminVehiclesPage({
       initialFilters={{
         search,
         status,
-        type,
+        categoryId,
       }}
     />
   );

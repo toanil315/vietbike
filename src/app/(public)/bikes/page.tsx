@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import BikesClient from "./bikes-client";
-import { Vehicle } from "@/types";
+import { Vehicle, VehicleCategory } from "@/types";
 
 export const metadata: Metadata = {
   title: "Browse Motorbikes for Rent in Vietnam",
@@ -14,7 +14,6 @@ interface BikesPageSearchParams {
   page?: string;
   pageSize?: string;
   categoryId?: string;
-  transmission?: string;
   minPrice?: string;
   maxPrice?: string;
   search?: string;
@@ -38,7 +37,6 @@ function parsePositiveInt(value: string | undefined, fallback: number): number {
 function hasActiveFilters(params: BikesPageSearchParams): boolean {
   return !!(
     params.categoryId ||
-    params.transmission ||
     params.minPrice ||
     params.maxPrice ||
     params.search ||
@@ -64,9 +62,8 @@ async function fetchBikes(searchParams: BikesPageSearchParams): Promise<{
     pageSize: pageSize.toString(),
   });
 
-  if (searchParams.categoryId) params.set("categoryId", searchParams.categoryId);
-  if (searchParams.transmission)
-    params.set("transmission", searchParams.transmission);
+  if (searchParams.categoryId)
+    params.set("categoryId", searchParams.categoryId);
   if (searchParams.minPrice) params.set("minPrice", searchParams.minPrice);
   if (searchParams.maxPrice) params.set("maxPrice", searchParams.maxPrice);
   if (searchParams.search) params.set("search", searchParams.search);
@@ -119,32 +116,40 @@ async function fetchBikes(searchParams: BikesPageSearchParams): Promise<{
   }
 }
 
-/**
- * Group vehicles by real backend categoryName for section-based display.
- * Returns a Map keyed by categoryName preserving insertion order.
- */
-function groupVehiclesByCategory(
-  vehicles: Vehicle[],
-): Map<string, { categoryId: string; description: string | null; vehicles: Vehicle[] }> {
-  const groups = new Map<
-    string,
-    { categoryId: string; description: string | null; vehicles: Vehicle[] }
-  >();
+async function fetchVehicleCategories(): Promise<VehicleCategory[]> {
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.API_URL ||
+    "http://localhost:5001";
 
-  for (const v of vehicles) {
-    const existing = groups.get(v.categoryName);
-    if (existing) {
-      existing.vehicles.push(v);
-    } else {
-      groups.set(v.categoryName, {
-        categoryId: v.categoryId,
-        description: v.categoryDescription,
-        vehicles: [v],
-      });
+  try {
+    const response = await fetch(
+      `${apiUrl}/admin/vehicle-categories?page=1&pageSize=200`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
+
+    if (!response.ok) {
+      return [];
     }
-  }
 
-  return groups;
+    const payload = (await response.json()) as {
+      success?: boolean;
+      data?: {
+        items?: VehicleCategory[];
+        data?: VehicleCategory[];
+      };
+    };
+
+    if (!payload.success) {
+      return [];
+    }
+
+    return payload.data?.items || payload.data?.data || [];
+  } catch {
+    return [];
+  }
 }
 
 export default async function BikesPage({
@@ -153,23 +158,10 @@ export default async function BikesPage({
   searchParams: Promise<BikesPageSearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const { vehicles, pagination, hasError } =
-    await fetchBikes(resolvedSearchParams);
-
-  const isFiltered = hasActiveFilters(resolvedSearchParams);
-  const groupedByCategory = isFiltered
-    ? null
-    : groupVehiclesByCategory(vehicles);
-
-  // Serialize Map to a plain array for client component
-  const groupedSections = groupedByCategory
-    ? Array.from(groupedByCategory.entries()).map(([name, data]) => ({
-        categoryName: name,
-        categoryId: data.categoryId,
-        description: data.description,
-        vehicles: data.vehicles,
-      }))
-    : null;
+  const [{ vehicles, pagination, hasError }, categories] = await Promise.all([
+    fetchBikes(resolvedSearchParams),
+    fetchVehicleCategories(),
+  ]);
 
   return (
     <div className="bg-surface-container/30 min-h-screen pb-20">
@@ -195,8 +187,10 @@ export default async function BikesPage({
         initialVehicles={vehicles}
         initialPagination={pagination}
         initialHasError={hasError}
-        isFiltered={isFiltered}
-        groupedSections={groupedSections}
+        categoryOptions={categories.map((category) => ({
+          id: category.id,
+          name: category.name,
+        }))}
       />
     </div>
   );

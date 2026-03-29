@@ -1,21 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  LayoutGrid,
-  List,
-  ChevronLeft,
-  ChevronRight,
-  Crown,
-  Bike,
-  Zap,
-  Fuel,
-} from "lucide-react";
+import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import BikeFilterBar from "@/components/bikes/BikeFilterBar";
 import BikeGrid from "@/components/bikes/BikeGrid";
-import VehicleSection from "@/components/bikes/VehicleSection";
 import { Vehicle } from "@/types";
 
 interface BikesPagination {
@@ -25,38 +15,18 @@ interface BikesPagination {
   totalPages: number;
 }
 
-interface GroupedSection {
-  categoryName: string;
-  categoryId: string;
-  description: string | null;
-  vehicles: Vehicle[];
-}
-
 interface BikesClientProps {
   initialVehicles: Vehicle[];
   initialPagination: BikesPagination;
   initialHasError: boolean;
-  isFiltered: boolean;
-  groupedSections: GroupedSection[] | null;
-}
-
-/**
- * Derive section icon from real backend category name
- */
-function getSectionIcon(categoryName: string) {
-  const lower = categoryName.toLowerCase();
-  if (lower.includes("premium")) return <Crown size={18} />;
-  if (lower.includes("electric")) return <Zap size={18} />;
-  if (lower.includes("50cc")) return <Fuel size={18} />;
-  return <Bike size={18} />;
+  categoryOptions: Array<{ id: string; name: string }>;
 }
 
 export default function BikesClient({
   initialVehicles,
   initialPagination,
   initialHasError,
-  isFiltered,
-  groupedSections,
+  categoryOptions,
 }: BikesClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -64,33 +34,23 @@ export default function BikesClient({
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const brand = searchParams.get("brand") || "Any Brand";
-  const type = searchParams.get("type")
-    ? `${searchParams.get("type")!.charAt(0).toUpperCase()}${searchParams
-        .get("type")!
-        .slice(1)}`
-    : "Select Types";
-  const transmission: "Auto" | "Manual" =
-    searchParams.get("transmission") === "manual" ? "Manual" : "Auto";
-  const priceRange = Math.max(
-    1,
-    Math.floor((Number(searchParams.get("maxPrice")) || 1000000) / 100000),
-  );
+  const categoryId = searchParams.get("categoryId") || "";
+  const search = searchParams.get("search") || "";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
   const sortBy = (() => {
     const sortByParam = searchParams.get("sortBy");
     const sortOrderParam = searchParams.get("sortOrder");
 
     if (sortByParam === "pricePerDay" && sortOrderParam === "asc") {
-      return "Price: Low to High";
-    }
-    if (sortByParam === "pricePerDay" && sortOrderParam === "desc") {
-      return "Price: High to Low";
-    }
-    if (sortByParam === "rating") {
-      return "Rating";
+      return "priceAsc";
     }
 
-    return "Recommended";
+    if (sortByParam === "pricePerDay" && sortOrderParam === "desc") {
+      return "priceDesc";
+    }
+
+    return "recommended";
   })();
 
   const currentPage = useMemo(() => {
@@ -127,47 +87,42 @@ export default function BikesClient({
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
   }
 
-  function handleBrandChange(value: string) {
+  function handleCategoryIdChange(value: string) {
     updateRoute({
-      brand: value === "Any Brand" ? undefined : value,
+      categoryId: value || undefined,
       page: "1",
     });
   }
 
-  function handleTypeChange(value: string) {
+  function handleSearchChange(value: string) {
     updateRoute({
-      type: value === "Select Types" ? undefined : value.toLowerCase(),
+      search: value || undefined,
       page: "1",
     });
   }
 
-  function handleTransmissionChange(value: "Auto" | "Manual") {
+  function handleMinPriceChange(value: string) {
     updateRoute({
-      transmission: value === "Auto" ? "automatic" : "manual",
+      minPrice: value || undefined,
       page: "1",
     });
   }
 
-  function handlePriceRangeChange(value: number) {
+  function handleMaxPriceChange(value: string) {
     updateRoute({
-      maxPrice: (value * 100000).toString(),
+      maxPrice: value || undefined,
       page: "1",
     });
   }
 
   function handleSortByChange(value: string) {
-    if (value === "Price: Low to High") {
+    if (value === "priceAsc") {
       updateRoute({ sortBy: "pricePerDay", sortOrder: "asc", page: "1" });
       return;
     }
 
-    if (value === "Price: High to Low") {
+    if (value === "priceDesc") {
       updateRoute({ sortBy: "pricePerDay", sortOrder: "desc", page: "1" });
-      return;
-    }
-
-    if (value === "Rating") {
-      updateRoute({ sortBy: "rating", sortOrder: "desc", page: "1" });
       return;
     }
 
@@ -176,30 +131,6 @@ export default function BikesClient({
 
   function handlePageChange(page: number) {
     updateRoute({ page: page.toString() });
-  }
-
-  /** Section-based view: renders each category from real API data */
-  function renderSectionView() {
-    if (!groupedSections || groupedSections.length === 0) {
-      return renderNoResults();
-    }
-
-    return (
-      <div className="max-w-7xl mx-auto px-4 md:px-8 divide-y divide-outline-variant/10">
-        {groupedSections.map((section) => (
-          <VehicleSection
-            key={section.categoryId}
-            icon={getSectionIcon(section.categoryName)}
-            sectionLabel="OUR BIKES"
-            title={section.categoryName}
-            subtitle={section.description || ""}
-            vehicles={section.vehicles}
-            viewAllHref={`/bikes?categoryId=${section.categoryId}`}
-            viewAllLabel={`View Full ${section.categoryName}`}
-          />
-        ))}
-      </div>
-    );
   }
 
   /** Flat grid view when filters are active */
@@ -217,7 +148,7 @@ export default function BikesClient({
 
   function renderNoResults() {
     return (
-      <div className="bg-white rounded-3xl p-20 text-center border border-outline-variant/10">
+      <div className="bg-white md:mx-8 rounded-3xl p-20 text-center border border-outline-variant/10">
         <h3 className="text-2xl font-bold mb-2">No motorbikes found</h3>
         <p className="text-secondary">
           Try adjusting your filters to find your perfect ride.
@@ -225,12 +156,10 @@ export default function BikesClient({
         <button
           onClick={() => {
             updateRoute({
-              brand: undefined,
-              type: undefined,
               categoryId: undefined,
-              transmission: undefined,
               minPrice: undefined,
               maxPrice: undefined,
+              search: undefined,
               sortBy: undefined,
               sortOrder: undefined,
               page: "1",
@@ -335,51 +264,21 @@ export default function BikesClient({
     );
   }
 
-  // Section-based view for unfiltered, flat grid for filtered
-  if (!isFiltered) {
-    return (
-      <>
-        {/* Filter bar at top — entering any filter switches to flat grid */}
-        <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
-          <BikeFilterBar
-            type={type}
-            setType={handleTypeChange}
-            brand={brand}
-            setBrand={handleBrandChange}
-            transmission={transmission}
-            setTransmission={handleTransmissionChange}
-            sortBy={sortBy}
-            setSortBy={handleSortByChange}
-            priceRange={priceRange}
-            setPriceRange={handlePriceRangeChange}
-          />
-        </div>
-
-        {hasError ? (
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <VehiclesError />
-          </div>
-        ) : (
-          renderSectionView()
-        )}
-      </>
-    );
-  }
-
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 md:px-8 mb-8">
         <BikeFilterBar
-          type={type}
-          setType={handleTypeChange}
-          brand={brand}
-          setBrand={handleBrandChange}
-          transmission={transmission}
-          setTransmission={handleTransmissionChange}
+          categoryId={categoryId}
+          setCategoryId={handleCategoryIdChange}
+          search={search}
+          setSearch={handleSearchChange}
+          minPrice={minPrice}
+          setMinPrice={handleMinPriceChange}
+          maxPrice={maxPrice}
+          setMaxPrice={handleMaxPriceChange}
           sortBy={sortBy}
           setSortBy={handleSortByChange}
-          priceRange={priceRange}
-          setPriceRange={handlePriceRangeChange}
+          categoryOptions={categoryOptions}
         />
       </div>
 

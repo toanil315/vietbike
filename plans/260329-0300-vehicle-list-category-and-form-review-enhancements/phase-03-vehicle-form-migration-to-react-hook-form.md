@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 8h
 
 Migrate `VehicleForm` from local `useState` form state to React Hook Form and align update flow with backend support for `categoryId` updates.
@@ -75,11 +75,11 @@ Create (if needed to keep file maintainable):
 
 ## Todo List
 
-- [ ] Introduce RHF form state in VehicleForm
-- [ ] Map edit preload to RHF reset flow
-- [ ] Migrate images/features inputs to RHF-compatible arrays
-- [ ] Always include categoryId in vehicle update payload
-- [ ] Validate create/edit payload integrity after migration
+- [x] Introduce RHF form state in VehicleForm
+- [x] Map edit preload to RHF reset flow
+- [x] Migrate images/features inputs to RHF-compatible arrays
+- [x] Always include categoryId in vehicle update payload
+- [x] Validate create/edit payload integrity after migration
 
 ## Success Criteria
 
@@ -99,3 +99,9 @@ Create (if needed to keep file maintainable):
 ## Next Steps
 
 - Update coding standards with RHF guidance in Phase 4.
+
+## Execution Notes
+
+- `VehicleForm` now uses `useForm` + `zodResolver` + `useFieldArray`.
+- Edit-mode preload now uses RHF `reset()`.
+- `updateVehicleAction` input now requires `categoryId` and submit mapping always includes it.

@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 6h
 
 Make public bikes listing consume category catalog directly for both filter options and section grouping.
@@ -72,11 +72,11 @@ Create (optional helper):
 
 ## Todo List
 
-- [ ] Add category API fetch in public bikes server page
-- [ ] Implement category-first section composer
-- [ ] Pass server categoryOptions into bikes client
-- [ ] Remove derived categoryOptions fallback in bikes client
-- [ ] Verify unfiltered and filtered page behavior parity
+- [x] Add category API fetch in public bikes server page
+- [x] Implement category-first section composer
+- [x] Pass server categoryOptions into bikes client
+- [x] Remove derived categoryOptions fallback in bikes client
+- [x] Verify unfiltered and filtered page behavior parity
 
 ## Success Criteria
 
@@ -95,3 +95,10 @@ Create (optional helper):
 ## Next Steps
 
 - Hand off admin form migration to Phase 3.
+
+## Execution Notes
+
+- `bikes/page.tsx` now fetches categories and vehicles concurrently.
+- `bikes-client.tsx` now receives `categoryOptions` from server props only.
+- Latest scope update: bikes page section grouping was intentionally removed; page now keeps flat-list rendering while still relying on API-sourced category options.
+- Homepage now follows category-first flow and fetches up to 4 vehicles per category in parallel, skipping empty categories.

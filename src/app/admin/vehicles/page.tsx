@@ -1,6 +1,9 @@
 import VehicleTable from "@/components/admin/VehicleTable";
-import { adminVehicleEndpoints } from "@/lib/api-endpoints";
-import { Vehicle } from "@/types";
+import {
+  adminVehicleCategoryEndpoints,
+  adminVehicleEndpoints,
+} from "@/lib/api-endpoints";
+import { Vehicle, VehicleCategory } from "@/types";
 
 interface AdminVehiclesPageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -14,6 +17,44 @@ interface VehiclesPageResponse {
     pageSize: number;
     totalPages: number;
   };
+}
+
+async function getVehicleCategoryOptions(): Promise<
+  Array<{ id: string; name: string }>
+> {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+
+  try {
+    const response = await fetch(
+      `${apiBaseUrl}${adminVehicleCategoryEndpoints.list()}?page=1&pageSize=200`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const payload = (await response.json()) as {
+      success?: boolean;
+      data?: {
+        items?: VehicleCategory[];
+      };
+    };
+
+    if (!payload.success) {
+      return [];
+    }
+
+    const categories = payload.data?.items || [];
+    return categories.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 async function getVehiclesData(
@@ -79,7 +120,10 @@ export default async function AdminVehiclesPage({
     ...(categoryId ? { categoryId } : {}),
   });
 
-  const vehiclesData = await getVehiclesData(query);
+  const [vehiclesData, categoryOptions] = await Promise.all([
+    getVehiclesData(query),
+    getVehicleCategoryOptions(),
+  ]);
 
   return (
     <VehicleTable
@@ -95,6 +139,7 @@ export default async function AdminVehiclesPage({
         status,
         categoryId,
       }}
+      categoryOptions={categoryOptions}
     />
   );
 }

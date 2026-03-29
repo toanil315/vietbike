@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P2  
-Status: Pending  
+Status: Completed  
 Effort: 1h
 
 Update project coding standards to explicitly prefer React Hook Form for form implementations.
@@ -50,9 +50,9 @@ Modify:
 
 ## Todo List
 
-- [ ] Add RHF guidance to code standards doc
-- [ ] Add validation pairing guidance (RHF + Zod)
-- [ ] Add concise exception for trivial forms
+- [x] Add RHF guidance to code standards doc
+- [x] Add validation pairing guidance (RHF + Zod)
+- [x] Add concise exception for trivial forms
 
 ## Success Criteria
 
@@ -70,3 +70,7 @@ Modify:
 ## Next Steps
 
 - Complete regression checklist in Phase 5.
+
+## Execution Notes
+
+- Added RHF + Zod guidance and tiny-form exception in `docs/code-standards.md`.

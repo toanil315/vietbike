@@ -51,6 +51,8 @@ This document defines practical standards for this repository.
 - Validate external input with schemas in `src/lib/validation.ts`.
 - Keep business rules in schema refinements when practical.
 - Return field-level validation feedback for forms.
+- For React form implementations, use React Hook Form as the default form state layer and pair it with Zod resolver for schema-driven validation.
+- Exception: tiny forms with one or two simple fields may use local state when React Hook Form adds unnecessary complexity.
 
 ## Styling and UI
 

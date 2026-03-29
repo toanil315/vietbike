@@ -23,7 +23,7 @@ async function fetchBikesForStaticGeneration() {
     const vehicles = await apiClient.get<PaginatedData<Vehicle>>(
       vehicleEndpoints.list(),
       {
-        next: { revalidate: ISR_REVALIDATE } as any,
+        next: { revalidate: 3600 },
       },
     );
 

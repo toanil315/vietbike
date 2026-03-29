@@ -3,7 +3,7 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: Completed  
 Effort: 4h
 
 Unify category API response handling and establish reusable query helpers before public and admin enhancements.
@@ -63,10 +63,10 @@ Modify:
 
 ## Todo List
 
-- [ ] Align category list response typing
-- [ ] Add category response normalizer helper
-- [ ] Migrate existing category fetch call sites to helper
-- [ ] Run typecheck for category consumer files
+- [x] Align category list response typing
+- [x] Add category response normalizer helper
+- [x] Migrate existing category fetch call sites to helper
+- [x] Run typecheck for category consumer files
 
 ## Success Criteria
 
@@ -85,3 +85,8 @@ Modify:
 ## Next Steps
 
 - Feed normalized category data into public bikes composition in Phase 2.
+
+## Execution Notes
+
+- Added `normalizeCategoriesPayload` and category fetch logic in public bikes server flow.
+- Verified category consumer files are type-safe via `npm run build`.

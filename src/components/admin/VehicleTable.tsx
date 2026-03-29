@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -27,8 +27,9 @@ interface VehicleTableProps {
   initialFilters: {
     search: string;
     status: string;
-    type: string;
+    categoryId: string;
   };
+  categoryOptions: Array<{ id: string; name: string }>;
 }
 
 /**
@@ -38,28 +39,23 @@ export default function VehicleTable({
   initialVehicles,
   initialPagination,
   initialFilters,
+  categoryOptions,
 }: VehicleTableProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const [search, setSearch] = useState(initialFilters.search);
   const [statusFilter, setStatusFilter] = useState(initialFilters.status);
-  const [typeFilter, setTypeFilter] = useState(initialFilters.type);
+  const [categoryFilter, setCategoryFilter] = useState(
+    initialFilters.categoryId,
+  );
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   useEffect(() => {
     setSearch(initialFilters.search);
     setStatusFilter(initialFilters.status);
-    setTypeFilter(initialFilters.type);
-  }, [initialFilters.search, initialFilters.status, initialFilters.type]);
-
-  const filteredVehicles = useMemo(() => {
-    if (!typeFilter) {
-      return initialVehicles;
-    }
-
-    return initialVehicles.filter((vehicle) => vehicle.type === typeFilter);
-  }, [initialVehicles, typeFilter]);
+    setCategoryFilter(initialFilters.categoryId);
+  }, [initialFilters.search, initialFilters.status, initialFilters.categoryId]);
 
   const statusColors: Record<VehicleStatus, string> = {
     available: "bg-emerald-100 text-emerald-700",
@@ -81,9 +77,9 @@ export default function VehicleTable({
           ? String(overrides.status)
           : (statusFilter ?? "");
       const nextType =
-        overrides.type !== undefined
-          ? String(overrides.type)
-          : (typeFilter ?? "");
+        overrides.categoryId !== undefined
+          ? String(overrides.categoryId)
+          : (categoryFilter ?? "");
       const nextPage =
         overrides.page !== undefined
           ? Number(overrides.page)
@@ -91,7 +87,7 @@ export default function VehicleTable({
 
       if (nextSearch) params.set("search", nextSearch);
       if (nextStatus) params.set("status", nextStatus);
-      if (nextType) params.set("type", nextType);
+      if (nextType) params.set("categoryId", nextType);
       params.set("page", String(Math.max(1, nextPage)));
       params.set("pageSize", String(initialPagination.pageSize));
 
@@ -101,7 +97,7 @@ export default function VehicleTable({
     [
       search,
       statusFilter,
-      typeFilter,
+      categoryFilter,
       initialPagination.page,
       initialPagination.pageSize,
       pathname,
@@ -113,10 +109,10 @@ export default function VehicleTable({
     updateQueryParams({
       search,
       status: statusFilter,
-      type: typeFilter,
+      categoryId: categoryFilter,
       page: 1,
     });
-  }, [search, statusFilter, typeFilter, updateQueryParams]);
+  }, [search, statusFilter, categoryFilter, updateQueryParams]);
 
   /**
    * Handle previous page
@@ -220,14 +216,16 @@ export default function VehicleTable({
           </select>
 
           <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
             className="bg-surface-container/50 border border-outline-variant/20 rounded-xl py-3 px-4 text-sm font-medium focus:outline-none"
           >
-            <option value="">Tất cả loại xe</option>
-            <option value="motorcycle">Motorcycle</option>
-            <option value="scooter">Scooter</option>
-            <option value="electric">Electric</option>
+            <option value="">Tất cả danh mục</option>
+            {categoryOptions.map(({ id, name }) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
           </select>
 
           <button
@@ -284,7 +282,7 @@ export default function VehicleTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/10">
-              {filteredVehicles.map((vehicle) => (
+              {initialVehicles.map((vehicle) => (
                 <tr
                   key={vehicle.id}
                   className="hover:bg-surface-container/20 transition-colors group"
@@ -344,22 +342,6 @@ export default function VehicleTable({
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <select
-                        value={vehicle.status}
-                        onChange={(e) =>
-                          handleStatusChange(
-                            vehicle.id,
-                            e.target.value as VehicleStatus,
-                          )
-                        }
-                        disabled={updatingStatusId === vehicle.id}
-                        className="text-xs rounded-lg border border-outline-variant/20 px-2 py-1 bg-white"
-                      >
-                        <option value="available">available</option>
-                        <option value="rented">rented</option>
-                        <option value="maintenance">maintenance</option>
-                        <option value="unavailable">unavailable</option>
-                      </select>
                       <Link
                         href={`/admin/vehicles/${vehicle.id}`}
                         className="p-2 rounded-lg text-secondary hover:bg-primary/10 hover:text-primary transition-default"

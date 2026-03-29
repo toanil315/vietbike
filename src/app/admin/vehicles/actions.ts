@@ -59,6 +59,21 @@ export interface VehicleFormInput {
   features?: Array<{ featureName: string; featureValue: string }>;
 }
 
+function revalidateVehiclePaths(vehicleId?: string, vehicleSlug?: string) {
+  revalidatePath("/admin/vehicles");
+
+  if (vehicleId) {
+    revalidatePath(`/admin/vehicles/${vehicleId}`);
+  }
+
+  if (vehicleSlug) {
+    revalidatePath(`/bikes/${vehicleSlug}`);
+  }
+
+  revalidatePath("/bikes");
+  revalidatePath("/");
+}
+
 export async function createVehicleAction(input: VehicleFormInput) {
   const result = await request<{ id: string; name: string; slug: string }>(
     adminVehicleEndpoints.create(),
@@ -69,7 +84,7 @@ export async function createVehicleAction(input: VehicleFormInput) {
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
+    revalidateVehiclePaths();
   }
 
   return result;
@@ -77,12 +92,7 @@ export async function createVehicleAction(input: VehicleFormInput) {
 
 export async function updateVehicleAction(
   vehicleId: string,
-  input: Omit<
-    VehicleFormInput,
-    "type" | "images" | "features" | "categoryId"
-  > & {
-    categoryId?: string;
-  },
+  input: Omit<VehicleFormInput, "type" | "images" | "features">,
 ) {
   const result = await request<{ id: string; name: string; slug: string }>(
     adminVehicleEndpoints.update(vehicleId),
@@ -93,8 +103,7 @@ export async function updateVehicleAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId, result.data?.slug);
   }
 
   return result;
@@ -113,8 +122,7 @@ export async function updateVehicleStatusAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId, result.data?.id);
   }
 
   return result;
@@ -133,8 +141,7 @@ export async function addVehicleImageAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId);
   }
 
   return result;
@@ -152,8 +159,7 @@ export async function deleteVehicleImageAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId);
   }
 
   return result;
@@ -172,8 +178,7 @@ export async function reorderVehicleImagesAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId);
   }
 
   return result;
@@ -192,8 +197,7 @@ export async function addVehicleFeatureAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId);
   }
 
   return result;
@@ -211,8 +215,7 @@ export async function deleteVehicleFeatureAction(
   );
 
   if (result.ok) {
-    revalidatePath("/admin/vehicles");
-    revalidatePath(`/admin/vehicles/${vehicleId}`);
+    revalidateVehiclePaths(vehicleId);
   }
 
   return result;

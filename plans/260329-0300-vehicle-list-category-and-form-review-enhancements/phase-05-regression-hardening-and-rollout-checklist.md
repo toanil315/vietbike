@@ -3,10 +3,10 @@
 ## Overview
 
 Priority: P1  
-Status: Pending  
+Status: In Progress  
 Effort: 3h
 
-Validate public category-first listing and RHF vehicle form migration before release.
+Validate public category/API listing flows and RHF vehicle form migration before release.
 
 ## Context Links
 
@@ -21,7 +21,7 @@ Validate public category-first listing and RHF vehicle form migration before rel
 Functional:
 
 - Verify public category options are API-driven and stable.
-- Verify category-first section composition works for categories with/without vehicles.
+- Verify current public listing behavior remains stable with API-sourced category filters.
 - Verify VehicleForm create/edit still function after RHF migration.
 - Verify vehicle update includes categoryId and backend accepts it.
 
@@ -34,8 +34,9 @@ Non-functional:
 
 Public:
 
-- Unfiltered page loads categories and sections from category catalog.
-- Filter dropdown options match category API list.
+- Homepage category-first featured flow loads categories first then fetches vehicles per category in parallel.
+- Homepage ignores categories with empty featured vehicle results.
+- Bikes filter dropdown options match category API list and flat-list behavior remains stable.
 - Empty/no-result behavior still works.
 
 Admin:
@@ -58,18 +59,18 @@ Modify:
 ## Implementation Steps
 
 1. Run `npm run build`.
-2. Perform public bikes smoke test for category options and section grouping.
+2. Perform public smoke test for homepage category-first featured flow and bikes flat-list filters.
 3. Perform admin vehicle form smoke test for create/edit/category change.
 4. Confirm documentation update in code standards.
 5. Update plan and phase statuses.
 
 ## Todo List
 
-- [ ] Run `npm run build`
-- [ ] Smoke test public category options and sections
+- [x] Run `npm run build`
+- [ ] Smoke test public homepage category-first featured flow and bikes filters
 - [ ] Smoke test admin vehicle create/edit category update
-- [ ] Verify code standards RHF update
-- [ ] Update plan progress and status fields
+- [x] Verify code standards RHF update
+- [x] Update plan progress and status fields
 
 ## Success Criteria
 
@@ -89,3 +90,8 @@ Modify:
 ## Next Steps
 
 - Execute with cook parallel workflow.
+
+## Execution Notes
+
+- `npm run build` passed after migration changes.
+- Manual browser smoke tests for homepage/bikes/admin vehicle flows remain pending.

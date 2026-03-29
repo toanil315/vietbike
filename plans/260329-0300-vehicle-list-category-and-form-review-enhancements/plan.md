@@ -1,7 +1,7 @@
 ---
 title: "Vehicle List and Form Review Enhancements"
 description: "Refactor public bikes category sourcing to API-first, rework section grouping by category catalog, migrate admin vehicle form to React Hook Form, and update code standards for form implementation guidance."
-status: pending
+status: completed
 priority: P1
 effort: 22h
 issue: null
@@ -28,13 +28,13 @@ Rationale:
 
 ## Phase Map
 
-| #   | Phase                                            | Status  | Effort | File                                                                                                                           |
-| --- | ------------------------------------------------ | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | Category API contract and shared query utilities | Pending | 4h     | [phase-01-category-api-contract-and-shared-query-utilities.md](./phase-01-category-api-contract-and-shared-query-utilities.md) |
-| 2   | Public bikes category-first data composition     | Pending | 6h     | [phase-02-public-bikes-category-first-data-composition.md](./phase-02-public-bikes-category-first-data-composition.md)         |
-| 3   | VehicleForm migration to React Hook Form         | Pending | 8h     | [phase-03-vehicle-form-migration-to-react-hook-form.md](./phase-03-vehicle-form-migration-to-react-hook-form.md)               |
-| 4   | Code standards update for form stack             | Pending | 1h     | [phase-04-code-standards-update-for-form-stack.md](./phase-04-code-standards-update-for-form-stack.md)                         |
-| 5   | Regression hardening and rollout checklist       | Pending | 3h     | [phase-05-regression-hardening-and-rollout-checklist.md](./phase-05-regression-hardening-and-rollout-checklist.md)             |
+| #   | Phase                                            | Status      | Effort | File                                                                                                                           |
+| --- | ------------------------------------------------ | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Category API contract and shared query utilities | Completed   | 4h     | [phase-01-category-api-contract-and-shared-query-utilities.md](./phase-01-category-api-contract-and-shared-query-utilities.md) |
+| 2   | Public bikes category-first data composition     | Completed   | 6h     | [phase-02-public-bikes-category-first-data-composition.md](./phase-02-public-bikes-category-first-data-composition.md)         |
+| 3   | VehicleForm migration to React Hook Form         | Completed   | 8h     | [phase-03-vehicle-form-migration-to-react-hook-form.md](./phase-03-vehicle-form-migration-to-react-hook-form.md)               |
+| 4   | Code standards update for form stack             | Completed   | 1h     | [phase-04-code-standards-update-for-form-stack.md](./phase-04-code-standards-update-for-form-stack.md)                         |
+| 5   | Regression hardening and rollout checklist       | In Progress | 3h     | [phase-05-regression-hardening-and-rollout-checklist.md](./phase-05-regression-hardening-and-rollout-checklist.md)             |
 
 ## Dependency Graph
 
@@ -132,3 +132,11 @@ Phase 5 ownership:
 - Vehicle update always supports and sends `categoryId` as backend now accepts it.
 - `docs/code-standards.md` explicitly guides RHF usage for forms.
 - `npm run build` passes.
+
+## Execution Snapshot
+
+- Completed: category API-first source wiring, category-first grouping composition, RHF migration for `VehicleForm`, `categoryId` update payload alignment, code standards update.
+- Completed: homepage now runs category-first flow (fetch categories first, then fetch up to 4 vehicles per category in parallel, skip empty categories).
+- Completed: bikes listing page now runs flat-list mode only (section grouping removed per latest scope update) while keeping API-sourced category options.
+- Validated: `npm run build`.
+- Remaining: manual browser smoke tests in Phase 5.

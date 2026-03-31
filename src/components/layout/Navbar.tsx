@@ -1,11 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Bike, User, LayoutDashboard, Search, ShoppingBag } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Menu,
+  X,
+  Bike,
+  User,
+  LayoutDashboard,
+  Search,
+  ShoppingBag,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,24 +24,22 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Fleet', href: '/bikes' },
-    { name: 'Locations', href: '/#locations' },
-    { name: 'Contact', href: '/contact' },
+    { name: "Home", href: "/" },
+    { name: "Fleet", href: "/bikes" },
+    { name: "Locations", href: "/#locations" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
-    <nav 
+    <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500 h-20 flex items-center px-4 md:px-8",
-        scrolled 
-          ? "bg-white/80 backdrop-blur-xl shadow-sm border-b border-outline-variant/10 h-16" 
-          : "bg-transparent"
+        "bg-white/80 backdrop-blur-xl shadow-sm border-b border-outline-variant/10 h-16",
       )}
     >
       <div className="max-w-7xl mx-auto w-full flex justify-between items-center">
@@ -55,14 +61,18 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-sm font-bold uppercase tracking-widest transition-all duration-300 hover:text-primary relative group",
-                  pathname === link.href ? "text-primary" : "text-secondary"
+                  pathname === link.href ? "text-primary" : "text-secondary",
                 )}
               >
                 {link.name}
-                <span className={cn(
-                  "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
-                  pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
-                )}></span>
+                <span
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
+                    pathname === link.href
+                      ? "w-full"
+                      : "w-0 group-hover:w-full",
+                  )}
+                ></span>
               </Link>
             ))}
           </div>
@@ -87,8 +97,8 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <button 
-          className="md:hidden w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface transition-colors hover:bg-primary/10 hover:text-primary" 
+        <button
+          className="md:hidden w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface transition-colors hover:bg-primary/10 hover:text-primary"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
@@ -98,7 +108,7 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -110,7 +120,7 @@ export default function Navbar() {
                 href={link.href}
                 className={cn(
                   "text-xl font-bold transition-colors",
-                  pathname === link.href ? "text-primary" : "text-on-surface"
+                  pathname === link.href ? "text-primary" : "text-on-surface",
                 )}
                 onClick={() => setIsOpen(false)}
               >

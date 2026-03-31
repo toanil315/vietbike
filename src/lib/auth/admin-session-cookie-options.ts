@@ -9,7 +9,7 @@ export type AdminSessionCookieOptions = {
 export function getAdminSessionCookieOptions(): AdminSessionCookieOptions {
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false, // Set to true in production with HTTPS
     sameSite: "lax",
     path: "/",
     maxAge: 4 * 60 * 60,

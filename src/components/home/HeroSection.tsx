@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
 import { motion } from "motion/react";
-import Image from "next/image";
 
 export default function HeroSection() {
   return (
@@ -17,7 +16,7 @@ export default function HeroSection() {
           className="w-full h-full object-cover opacity-60"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-on-surface via-on-surface/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-on-surface via-on-surface/40 to-transparent"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full">
@@ -81,24 +80,30 @@ export default function HeroSection() {
       </div>
 
       {/* Floating Stats */}
-      <div className="absolute bottom-12 right-12 hidden lg:flex gap-12 text-white">
+      <div className="absolute bottom-10 right-10 hidden lg:flex items-center gap-10 rounded-3xl border border-white/20 bg-black/45 px-8 py-5 text-white backdrop-blur-md shadow-2xl shadow-black/30">
         <div>
-          <p className="text-4xl font-bold mb-1">500+</p>
-          <p className="text-xs font-bold text-white/50 uppercase tracking-widest">
+          <p className="text-4xl font-bold mb-1 text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.55)]">
+            500+
+          </p>
+          <p className="text-xs font-bold text-white/85 uppercase tracking-widest">
             Happy Riders
           </p>
         </div>
-        <div className="w-px h-12 bg-white/20"></div>
+        <div className="w-px h-12 bg-white/35"></div>
         <div>
-          <p className="text-4xl font-bold mb-1">12</p>
-          <p className="text-xs font-bold text-white/50 uppercase tracking-widest">
+          <p className="text-4xl font-bold mb-1 text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.55)]">
+            12
+          </p>
+          <p className="text-xs font-bold text-white/85 uppercase tracking-widest">
             Cities Covered
           </p>
         </div>
-        <div className="w-px h-12 bg-white/20"></div>
+        <div className="w-px h-12 bg-white/35"></div>
         <div>
-          <p className="text-4xl font-bold mb-1">4.9</p>
-          <p className="text-xs font-bold text-white/50 uppercase tracking-widest">
+          <p className="text-4xl font-bold mb-1 text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.55)]">
+            4.9
+          </p>
+          <p className="text-xs font-bold text-white/85 uppercase tracking-widest">
             Average Rating
           </p>
         </div>

@@ -1,15 +1,18 @@
 import { adminVehicleCategoryEndpoints } from "@/lib/api-endpoints";
 import CategoryManagementPage from "@/components/admin/categories/category-management-page";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { VehicleCategory } from "@/types";
 
 async function getCategoryData(): Promise<VehicleCategory[]> {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const authorization = await getAdminAuthorizationHeader();
 
   try {
     const response = await fetch(
       `${apiBaseUrl}${adminVehicleCategoryEndpoints.list()}?page=1&pageSize=200`,
       {
         cache: "no-store",
+        headers: { Authorization: authorization },
       },
     );
 

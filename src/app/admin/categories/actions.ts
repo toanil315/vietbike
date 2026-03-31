@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { adminVehicleCategoryEndpoints } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { VehicleCategory } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
@@ -26,10 +27,12 @@ async function request<T>(
   endpoint: string,
   options: RequestInit,
 ): Promise<{ ok: boolean; data?: T; error?: string }> {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      Authorization: authorization,
       ...(options.headers || {}),
     },
     cache: "no-store",
@@ -80,8 +83,6 @@ export async function updateVehicleCategoryAction(
       body: JSON.stringify(input),
     },
   );
-
-  console.log(result);
 
   if (result.ok) {
     revalidateCategoryPaths();

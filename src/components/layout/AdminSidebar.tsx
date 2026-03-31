@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Bike,
@@ -18,6 +19,22 @@ import { cn } from "@/lib/utils";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+
+    try {
+      await fetch("/api/admin/auth/logout", {
+        method: "POST",
+      });
+    } finally {
+      router.replace("/admin/login");
+      router.refresh();
+      setIsLoggingOut(false);
+    }
+  }
 
   const menuItems = [
     { name: "Tổng quan", icon: LayoutDashboard, href: "/admin" },
@@ -82,9 +99,16 @@ export default function AdminSidebar() {
             <HelpCircle size={20} />
             <span className="font-medium">Hỗ trợ</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:bg-surface-container transition-default">
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:bg-surface-container transition-default disabled:opacity-60"
+          >
             <LogOut size={20} />
-            <span className="font-medium">Đăng xuất</span>
+            <span className="font-medium">
+              {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+            </span>
           </button>
         </div>
       </div>

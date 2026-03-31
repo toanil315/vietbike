@@ -3,6 +3,7 @@ import {
   adminBookingEndpoints,
   adminVehicleEndpoints,
 } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { Booking, Vehicle } from "@/types";
 
 interface ListResponse<T> {
@@ -18,11 +19,16 @@ interface ListResponse<T> {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
 async function fetchVehicles(): Promise<ListResponse<Vehicle>> {
+  const authorization = await getAdminAuthorizationHeader();
+
   try {
     const query = new URLSearchParams({ page: "1", pageSize: "200" });
     const response = await fetch(
       `${API_BASE_URL}${adminVehicleEndpoints.list()}?${query.toString()}`,
-      { cache: "no-store" },
+      {
+        cache: "no-store",
+        headers: { Authorization: authorization },
+      },
     );
 
     if (!response.ok) {
@@ -48,11 +54,16 @@ async function fetchVehicles(): Promise<ListResponse<Vehicle>> {
 }
 
 async function fetchBookings(): Promise<ListResponse<Booking>> {
+  const authorization = await getAdminAuthorizationHeader();
+
   try {
     const query = new URLSearchParams({ page: "1", pageSize: "100" });
     const response = await fetch(
       `${API_BASE_URL}${adminBookingEndpoints.list()}?${query.toString()}`,
-      { cache: "no-store" },
+      {
+        cache: "no-store",
+        headers: { Authorization: authorization },
+      },
     );
 
     if (!response.ok) {

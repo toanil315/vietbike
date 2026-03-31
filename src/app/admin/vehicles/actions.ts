@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { adminVehicleEndpoints } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
@@ -20,10 +21,12 @@ async function request<T>(
   endpoint: string,
   options: RequestInit,
 ): Promise<{ ok: boolean; data?: T; error?: string }> {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      Authorization: authorization,
       ...(options.headers || {}),
     },
     cache: "no-store",

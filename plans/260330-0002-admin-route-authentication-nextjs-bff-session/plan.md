@@ -1,7 +1,7 @@
 ---
 title: "Admin Route Authentication with Next.js BFF Session"
 description: "Implement server-first admin authentication using secure cookie sessions, middleware guards, and server action authorization checks."
-status: pending
+status: completed
 priority: P1
 effort: 22h
 branch: main
@@ -26,14 +26,14 @@ No refresh flow in this phase. Expired token redirects to login.
 
 ## Phases
 
-| #   | Phase                                 | Status  | Effort | Link                                                              |
-| --- | ------------------------------------- | ------- | ------ | ----------------------------------------------------------------- |
-| 1   | Auth Contract and Session Utilities   | Pending | 4h     | [phase-01](./phase-01-auth-contract-and-session-utilities.md)     |
-| 2   | BFF Auth Route Handlers               | Pending | 4h     | [phase-02](./phase-02-nextjs-bff-auth-route-handlers.md)          |
-| 3   | Middleware Guard and Admin Login Gate | Pending | 4h     | [phase-03](./phase-03-middleware-guard-and-admin-login-gate.md)   |
-| 4   | Server Action Authorization Guard     | Pending | 4h     | [phase-04](./phase-04-admin-server-action-authorization-guard.md) |
-| 5   | Admin UI Integration and Logout Flow  | Pending | 3h     | [phase-05](./phase-05-admin-ui-integration-and-logout-flow.md)    |
-| 6   | Testing, Hardening, and Documentation | Pending | 3h     | [phase-06](./phase-06-testing-hardening-and-documentation.md)     |
+| #   | Phase                                 | Status    | Effort | Link                                                              |
+| --- | ------------------------------------- | --------- | ------ | ----------------------------------------------------------------- |
+| 1   | Auth Contract and Session Utilities   | Completed | 4h     | [phase-01](./phase-01-auth-contract-and-session-utilities.md)     |
+| 2   | BFF Auth Route Handlers               | Completed | 4h     | [phase-02](./phase-02-nextjs-bff-auth-route-handlers.md)          |
+| 3   | Middleware Guard and Admin Login Gate | Completed | 4h     | [phase-03](./phase-03-middleware-guard-and-admin-login-gate.md)   |
+| 4   | Server Action Authorization Guard     | Completed | 4h     | [phase-04](./phase-04-admin-server-action-authorization-guard.md) |
+| 5   | Admin UI Integration and Logout Flow  | Completed | 3h     | [phase-05](./phase-05-admin-ui-integration-and-logout-flow.md)    |
+| 6   | Testing, Hardening, and Documentation | Completed | 3h     | [phase-06](./phase-06-testing-hardening-and-documentation.md)     |
 
 ## Dependencies
 

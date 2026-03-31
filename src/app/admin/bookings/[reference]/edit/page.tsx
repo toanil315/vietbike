@@ -1,5 +1,6 @@
 import BookingUpsertForm from "@/components/admin/bookings/booking-upsert-form";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { Booking } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
@@ -11,10 +12,15 @@ interface EditBookingPageProps {
 async function fetchBookingByReference(
   reference: string,
 ): Promise<Booking | null> {
+  const authorization = await getAdminAuthorizationHeader();
+
   try {
     const response = await fetch(
       `${API_BASE_URL}${adminBookingEndpoints.detail(reference)}`,
-      { cache: "no-store" },
+      {
+        cache: "no-store",
+        headers: { Authorization: authorization },
+      },
     );
 
     if (!response.ok) {

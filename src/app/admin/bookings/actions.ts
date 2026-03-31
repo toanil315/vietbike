@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { SetSyncTargetPayload, UpdateBookingPayload } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
@@ -21,12 +22,14 @@ export async function updateBookingStatusAction(
   status: "confirmed" | "active" | "completed" | "cancelled",
   reason?: string,
 ) {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(
     `${API_BASE_URL}${adminBookingEndpoints.updateStatus(bookingId)}`,
     {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: authorization,
       },
       body: JSON.stringify({ status, reason }),
       cache: "no-store",
@@ -53,12 +56,14 @@ export async function updateBookingAction(
   bookingId: string,
   payload: UpdateBookingPayload,
 ) {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(
     `${API_BASE_URL}${adminBookingEndpoints.update(bookingId)}`,
     {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: authorization,
       },
       body: JSON.stringify(payload),
       cache: "no-store",
@@ -84,12 +89,14 @@ export async function updateBookingAction(
 }
 
 export async function setSyncTargetAction(payload: SetSyncTargetPayload) {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(
     `${API_BASE_URL}${adminBookingEndpoints.setSyncTarget()}`,
     {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: authorization,
       },
       body: JSON.stringify(payload),
       cache: "no-store",
@@ -114,12 +121,14 @@ export async function setSyncTargetAction(payload: SetSyncTargetPayload) {
 }
 
 export async function pullBookingSyncAction(batchSize: number = 200) {
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(
     `${API_BASE_URL}${adminBookingEndpoints.syncPull()}`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: authorization,
       },
       body: JSON.stringify({ batchSize }),
       cache: "no-store",

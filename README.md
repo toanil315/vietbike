@@ -83,4 +83,5 @@ Project documentation lives in `docs/`:
 ## Current Notes
 
 - Migration to Next.js is complete.
-- Remaining focus is stabilization and consistency (refund flow completion, add-ons completion, API response standardization, auth guard clarity).
+- Admin routes now use middleware + server-side auth guard with secure cookie session.
+- Remaining focus is stabilization and consistency (refund flow completion, add-ons completion, API response standardization).

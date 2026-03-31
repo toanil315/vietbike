@@ -3,6 +3,7 @@ import {
   adminVehicleCategoryEndpoints,
   adminVehicleEndpoints,
 } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { Vehicle, VehicleCategory } from "@/types";
 
 interface AdminVehiclesPageProps {
@@ -23,12 +24,14 @@ async function getVehicleCategoryOptions(): Promise<
   Array<{ id: string; name: string }>
 > {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const authorization = await getAdminAuthorizationHeader();
 
   try {
     const response = await fetch(
       `${apiBaseUrl}${adminVehicleCategoryEndpoints.list()}?page=1&pageSize=200`,
       {
         cache: "no-store",
+        headers: { Authorization: authorization },
       },
     );
 
@@ -61,11 +64,13 @@ async function getVehiclesData(
   queryParams: URLSearchParams,
 ): Promise<VehiclesPageResponse> {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const authorization = await getAdminAuthorizationHeader();
 
   const response = await fetch(
     `${apiBaseUrl}${adminVehicleEndpoints.list()}?${queryParams.toString()}`,
     {
       cache: "no-store",
+      headers: { Authorization: authorization },
     },
   );
 

@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-
+import FloatingContactButtons from "@/components/common/FloatingContactButtons";
 
 export default function PublicLayout({
   children,
@@ -11,9 +11,8 @@ export default function PublicLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-16">
-        {children}
-      </main>
+      <main className="flex-1 pt-16">{children}</main>
+      <FloatingContactButtons />
       <Footer />
     </div>
   );

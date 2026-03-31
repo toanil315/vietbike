@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import HeroSection from "@/components/home/HeroSection";
-import SearchBar from "@/components/home/SearchBar";
 import CategoryNav from "@/components/bikes/CategoryNav";
 import FeaturedBikes from "@/components/home/FeaturedBikes";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -130,14 +129,8 @@ export default async function HomePage() {
   return (
     <div className="bg-surface-container/30 min-h-screen">
       <HeroSection />
-      <div className="md:block hidden">
-        <SearchBar />
-      </div>
       <CategoryNav />
       <FeaturedBikes sections={featuredSections} />
-      <div className="md:hidden block">
-        <SearchBar />
-      </div>
       <WhyChooseUs />
       <CTASection />
     </div>

@@ -1,14 +1,83 @@
-import { Search, Bell, User } from 'lucide-react';
+"use client";
+
+import { useEffect, useState } from "react";
+import { Search, Bell, User } from "lucide-react";
+
+type SessionPayload = {
+  success: boolean;
+  data?: {
+    authenticated: boolean;
+    user: {
+      name: string | null;
+      email: string | null;
+    } | null;
+  };
+};
 
 export default function AdminHeader() {
+  const [displayName, setDisplayName] = useState("Quản trị viên");
+  const [displayRole, setDisplayRole] = useState("Quản trị cấp cao");
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function hydrateSession() {
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      try {
+        const sessionUrl = new URL(
+          "/api/admin/auth/session",
+          window.location.origin,
+        ).toString();
+
+        const response = await fetch(sessionUrl, {
+          method: "GET",
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as SessionPayload;
+        const name = payload.data?.user?.name;
+        const email = payload.data?.user?.email;
+
+        if (!mounted) {
+          return;
+        }
+
+        if (name) {
+          setDisplayName(name);
+        }
+
+        if (email) {
+          setDisplayRole(email);
+        }
+      } catch {
+        // Ignore session hydration errors; middleware still protects routes.
+      }
+    }
+
+    hydrateSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <header className="h-16 glass border-b border-outline-variant/15 flex items-center justify-between px-8 sticky top-0 z-40">
       <div className="flex items-center gap-4 w-96">
         <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={18} />
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm mọi thứ..." 
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Tìm kiếm mọi thứ..."
             className="w-full bg-surface-container border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-default"
           />
         </div>
@@ -19,11 +88,13 @@ export default function AdminHeader() {
           <Bell size={20} className="text-secondary" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-tertiary rounded-full border-2 border-white"></span>
         </button>
-        
+
         <div className="flex items-center gap-3 pl-6 border-l border-outline-variant/15">
           <div className="text-right">
-            <p className="text-sm font-semibold text-on-surface">Quản trị viên</p>
-            <p className="text-xs text-secondary">Quản trị cấp cao</p>
+            <p className="text-sm font-semibold text-on-surface">
+              {displayName}
+            </p>
+            <p className="text-xs text-secondary">{displayRole}</p>
           </div>
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
             <User size={20} />

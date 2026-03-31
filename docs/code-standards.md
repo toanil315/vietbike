@@ -46,6 +46,16 @@ This document defines practical standards for this repository.
 - Normalize API response handling to reduce envelope mismatch risks.
 - Surface user-facing errors through shared error utilities.
 
+## Admin Authentication Model
+
+- Protect `/admin/:path*` with `middleware.ts`; keep `/admin/login` public.
+- Store admin access token only in secure `httpOnly` cookie (`vietbike_admin_session`).
+- Never persist admin tokens in localStorage or sessionStorage.
+- Enforce role claim `roleKey` contains `admin_operations` before allowing admin access.
+- Apply token expiry checks with 5-minute clock skew tolerance.
+- Guard admin server actions using shared auth utility before backend calls.
+- Forward backend admin requests with `Authorization: Bearer <token>` from server-side context only.
+
 ## Validation
 
 - Validate external input with schemas in `src/lib/validation.ts`.
@@ -76,4 +86,3 @@ This document defines practical standards for this repository.
 
 - Standardize API response envelopes across hooks.
 - Finalize add-on and refund workflows.
-- Clarify and document admin auth/route guard model.

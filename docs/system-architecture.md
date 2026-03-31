@@ -27,6 +27,19 @@ Architecture style:
 - `src/lib/api.ts`: typed HTTP client, timeout, error parsing
 - `src/lib/api-endpoints.ts`: endpoint map/builders
 - Server actions in route segments for selected mutations
+- Auth boundary via Next.js route handlers:
+  - `src/app/api/admin/auth/login/route.ts`
+  - `src/app/api/admin/auth/logout/route.ts`
+  - `src/app/api/admin/auth/session/route.ts`
+
+## Admin Authentication and Authorization
+
+- Request-time guard: `middleware.ts` protects `/admin/:path*` and redirects unauthorized users to `/admin/login`.
+- Session model: admin token stored in `httpOnly` cookie `vietbike_admin_session`.
+- Claim policy: JWT must include `roleKey` with `admin_operations`.
+- Expiry policy: token expiry validated with 5-minute clock skew tolerance.
+- Server protection: admin server actions and server-rendered admin fetches read token server-side and forward bearer auth to backend.
+- Login UX: `next` query param preserved for destination-aware post-login redirect.
 
 4. Domain/Contract Layer
 
@@ -77,6 +90,5 @@ Admin flow:
 
 ## Known Architectural Risks
 
-- Authentication guard implementation details need clearer documentation.
 - Response envelope inconsistency across some hooks increases integration risk.
 - Unfinished refund/add-on areas create feature completeness gaps.

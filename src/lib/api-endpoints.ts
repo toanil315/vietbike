@@ -104,7 +104,7 @@ export const adminAuthEndpoints = {
    * Admin login with email and password
    * Returns JWT token
    */
-  login: () => "/admin/auth/login",
+  login: () => "/auth/login",
 
   /**
    * POST /admin/auth/refresh

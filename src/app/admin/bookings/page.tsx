@@ -1,5 +1,6 @@
 import BookingsManagementPage from "@/components/admin/bookings/bookings-management-page";
 import { adminBookingEndpoints } from "@/lib/api-endpoints";
+import { getAdminAuthorizationHeader } from "@/lib/auth/require-admin-auth";
 import { Booking, BookingListResponse } from "@/types";
 import { BookingListFilters } from "@/components/admin/bookings/bookings-list-filters";
 
@@ -13,10 +14,12 @@ async function fetchBookings(
   query: URLSearchParams,
 ): Promise<BookingsResponse> {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+  const authorization = await getAdminAuthorizationHeader();
   const response = await fetch(
     `${apiBaseUrl}${adminBookingEndpoints.list()}?${query.toString()}`,
     {
       cache: "no-store",
+      headers: { Authorization: authorization },
     },
   );
 

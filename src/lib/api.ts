@@ -1,3 +1,5 @@
+import { AdminSessionResponse } from "./auth/admin-auth-response";
+
 /**
  * API Client - Type-safe HTTP client with automatic error handling
  * Handles all communication with VietBike backend
@@ -23,7 +25,6 @@ export interface ApiError {
 
 export interface RequestOptions extends RequestInit {
   timeout?: number;
-  authToken?: string;
 }
 
 export class HttpClient {
@@ -33,34 +34,6 @@ export class HttpClient {
   constructor(baseUrl: string, defaultTimeout: number = 30000) {
     this.baseUrl = baseUrl;
     this.defaultTimeout = defaultTimeout;
-  }
-
-  private async resolveAuthToken(
-    authToken?: string,
-    headers?: Record<string, string>,
-  ): Promise<string | null> {
-    if (authToken) {
-      return authToken;
-    }
-
-    if (headers?.Authorization || headers?.authorization) {
-      return null;
-    }
-
-    if (typeof window !== "undefined") {
-      return null;
-    }
-
-    try {
-      const [{ cookies }, { ADMIN_SESSION_COOKIE_NAME }] = await Promise.all([
-        import("next/headers"),
-        import("@/lib/auth/admin-auth-constants"),
-      ]);
-      const cookieStore = await cookies();
-      return cookieStore.get(ADMIN_SESSION_COOKIE_NAME)?.value ?? null;
-    } catch {
-      return null;
-    }
   }
 
   /**
@@ -135,26 +108,19 @@ export class HttpClient {
     url: string,
     options: RequestOptions = {},
   ): Promise<T> {
-    const {
-      timeout: timeoutOverride,
-      authToken,
-      headers: optionHeaders,
-      ...fetchOptions
-    } = options;
+    const sessionResponse = await fetch(`/api/admin/auth/session`);
+    const body: AdminSessionResponse = await sessionResponse.json();
+    const token = body?.data?.accessToken ?? null;
 
-    const timeout = timeoutOverride || this.defaultTimeout;
+    const timeout = options.timeout || this.defaultTimeout;
     const fullUrl = `${this.baseUrl}${url}`;
 
     // Add default headers
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      ...((optionHeaders as Record<string, string>) || {}),
+      Authorization: token ? `Bearer ${token}` : "",
+      ...((options.headers as Record<string, string>) || {}),
     };
-
-    const token = await this.resolveAuthToken(authToken, headers);
-    if (token && !headers.Authorization && !headers.authorization) {
-      headers.Authorization = `Bearer ${token}`;
-    }
 
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -162,11 +128,11 @@ export class HttpClient {
 
     try {
       if (process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true") {
-        console.log(`[API] ${fetchOptions.method || "GET"} ${fullUrl}`);
+        console.log(`[API] ${options.method || "GET"} ${fullUrl}`);
       }
 
       const response = await fetch(fullUrl, {
-        ...fetchOptions,
+        ...options,
         headers,
         signal: controller.signal,
       });
